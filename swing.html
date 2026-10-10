@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swing Check — The Telestrator</title>
+<meta name="description" content="A human reads your swing. Scroll scrubs the slow-motion film while the coach's markup draws itself on, mark by mark.">
+<link rel="stylesheet" href="/src/shared.css">
+<style>
+  .hero { min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--edge) 12dvh; position: relative; }
+  .hero .kicker { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(64px, 11vw, 190px); }
+  .hero .sub { position: absolute; top: 22dvh; right: var(--edge); max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+  .hero .meta { position: absolute; bottom: 32px; right: var(--edge); text-align: right; font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); line-height: 1.8; }
+  .cue { position: absolute; bottom: 32px; left: var(--edge); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+
+  #tele-track { position: relative; height: 650vh; }
+  .stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: #000; }
+  .stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.4) contrast(1.05); }
+  .stage .shade { position: absolute; inset: 0; background: linear-gradient(#000000c9 0%, transparent 28%, transparent 60%, #000000d9 100%); pointer-events: none; }
+  svg.marks { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; }
+  svg.marks .draw { fill: none; stroke: #ffd23f; stroke-width: 3; stroke-linecap: round; }
+  svg.marks text { fill: #ffd23f; font-family: 'Space Mono', monospace; font-size: 15px; letter-spacing: .12em; }
+  svg.marks .tag-bg { fill: #000000aa; }
+
+  .mark-card { position: absolute; z-index: 5; left: var(--edge); right: var(--edge); bottom: 8dvh; display: grid; grid-template-columns: 1fr 1fr; gap: 24px 8vw; opacity: 0; visibility: hidden; }
+  .mark-card .mk { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #ffd23f; grid-column: 1 / -1; }
+  .mark-card h2 { font-size: clamp(44px, 6.5vw, 110px); grid-column: 1 / -1; max-width: 14ch; }
+  .mark-card .body { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: 56ch; }
+  .mark-card .aside { border-top: 1px solid var(--line); padding-top: 18px; font-size: 13px; line-height: 1.65; color: var(--muted); max-width: 48ch; align-self: start; }
+  .mark-card .aside strong { color: var(--ink); font-weight: 400; }
+  .mark-card ol.steps { grid-column: 1 / -1; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .mark-card ol.steps li { border-top: 1px solid var(--line); padding-top: 16px; font-size: 14px; line-height: 1.6; color: var(--muted); }
+  .mark-card ol.steps li b { display: block; color: var(--ink); font-weight: 400; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+
+  .tele-hud { position: absolute; z-index: 6; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .tele-hud.tl { top: 76px; left: var(--edge); }
+  .tele-hud.tr { top: 76px; right: var(--edge); font-variant-numeric: tabular-nums; }
+
+  .finale { position: relative; min-height: 100dvh; display: flex; align-items: flex-end; overflow: hidden; }
+  .finale video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; filter: grayscale(.6); }
+  .finale .inner { position: relative; z-index: 2; width: 100%; padding: 120px var(--edge) 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 8vw; background: linear-gradient(transparent, #000000e6 40%); }
+  .finale h2 { grid-column: 1 / -1; font-size: clamp(56px, 8.5vw, 150px); }
+  @media (max-width: 860px) {
+    .mark-card { grid-template-columns: 1fr; bottom: 5dvh; }
+    .mark-card ol.steps { grid-template-columns: 1fr; }
+    .hero .sub { position: static; margin-top: 24px; }
+    .finale .inner { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="hud">
+  <span>Two clips. One clear answer.</span>
+  <a class="brand" href="/">The Telestrator</a>
+  <a class="cta-link" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="kicker">Swing Check</p>
+    <h1 class="display">A human reads<br>your swing.</h1>
+    <p class="sub">Film it on your phone. Upload two clips. A private annotated video lands in your inbox within 24 hours. Your footage is never posted, never shared.</p>
+    <span class="cue">Scrub the film</span>
+    <div class="meta">$29 · One time<br>24-hour turnaround or your money back.</div>
+  </section>
+
+  <div id="tele-track">
+    <div class="stage" id="stage">
+      <video id="swingVid" muted playsinline preload="auto" src="/videos/swing-slowmo.mp4"></video>
+      <div class="shade"></div>
+      <svg class="marks" id="marks" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g id="g1" opacity="0">
+          <rect class="tag-bg" x="1010" y="120" width="230" height="34" />
+          <text x="1024" y="143">BACKSWING PLANE</text>
+          <line class="draw" x1="300" y1="700" x2="1140" y2="180" pathLength="1" />
+          <circle class="draw" cx="1060" cy="240" r="46" pathLength="1" />
+        </g>
+        <g id="g2" opacity="0">
+          <rect class="tag-bg" x="120" y="640" width="200" height="34" />
+          <text x="134" y="663">SPINE ANGLE</text>
+          <line class="draw" x1="620" y1="820" x2="700" y2="330" pathLength="1" />
+          <line class="draw" x1="700" y1="330" x2="640" y2="180" pathLength="1" />
+        </g>
+        <g id="g3" opacity="0">
+          <rect class="tag-bg" x="1050" y="560" width="180" height="34" />
+          <text x="1064" y="583">CLUB PATH</text>
+          <path class="draw" d="M 420 780 Q 760 640 1080 520 T 1330 380" pathLength="1" />
+        </g>
+        <g id="g4" opacity="0">
+          <rect class="tag-bg" x="620" y="120" width="140" height="34" />
+          <text x="634" y="143">IMPACT</text>
+          <circle class="draw" cx="720" cy="620" r="90" pathLength="1" />
+          <line class="draw" x1="630" y1="620" x2="810" y2="620" pathLength="1" />
+        </g>
+      </svg>
+
+      <div class="mark-card" id="mk1">
+        <p class="mk">Mark 01</p>
+        <h2 class="display">Two clips. That is all it takes.</h2>
+        <p class="body">One from behind, down the line. One facing you, face on. Your phone is fine. Slow motion mode helps but is not required. The whole thing takes less time than a bucket of range balls.</p>
+        <p class="aside"><strong>Film in bright light.</strong><br>Keep the full swing in frame. Landscape mode. Uploads open right after checkout.</p>
+      </div>
+      <div class="mark-card" id="mk2">
+        <p class="mk">Mark 02</p>
+        <h2 class="display">One fault. Named plainly.</h2>
+        <p class="body">Not five faults. One. The single biggest thing in your swing, named in plain English, with exactly three fixes in priority order so you know what to work on first. Plus one drill that attacks the first fault directly.</p>
+        <p class="aside"><strong>Private annotated video.</strong><br>Slow motion replay of your swing with drawn lines, the way a coach would mark it up. Delivered as a private link.<br><br><strong>No upsell.</strong> No $150 lesson. Just the answer.</p>
+      </div>
+      <div class="mark-card" id="mk3">
+        <p class="mk">Mark 03</p>
+        <h2 class="display">Three steps. One day.</h2>
+        <ol class="steps">
+          <li><b>Step 1 — Pay $29</b>Secure checkout, takes under a minute. 24-hour turnaround or your money back.</li>
+          <li><b>Step 2 — Upload two clips</b>Down the line and face on. Fields activate the moment checkout completes.</li>
+          <li><b>Step 3 — Get the read</b>A private video link lands in your inbox within 24 hours. Never posted, never shared.</li>
+        </ol>
+      </div>
+      <div class="mark-card" id="mk4">
+        <p class="mk">Mark 04</p>
+        <h2 class="display">The honest part.</h2>
+        <p class="body">The read comes from someone who played competitive golf from age 4 to 19 and studied kinesiology. Not a certified instructor. One fault at a time is the whole point. This will not fix your swing in a day, and it does not pretend to.</p>
+        <p class="aside"><strong>Intake pauses before it slips.</strong><br>If order volume exceeds what can be reviewed in a day, intake pauses instead of delivering late.</p>
+      </div>
+
+      <span class="tele-hud tl">Slow-mo · Scrub to analyze</span>
+      <span class="tele-hud tr" id="framecount">FRAME 0000</span>
+    </div>
+  </div>
+
+  <section class="finale">
+    <video muted loop playsinline autoplay src="/videos/swing-impact.mp4"></video>
+    <div class="inner">
+      <h2 class="display">One critique.<br>One clear answer.</h2>
+      <div>
+        <p class="price">$29</p>
+        <p class="per">One time</p>
+      </div>
+      <div>
+        <a class="btn" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
+        <p class="per" style="margin-top:16px;">24-hour turnaround or your money back.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <span>Swing Check · Official page</span>
+  <a href="/">All stories</a>
+</footer>
+
+<script type="module" src="/src/swing.js"></script>
+</body>
+</html>
