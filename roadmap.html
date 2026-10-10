@@ -58,7 +58,7 @@
   /* giant act title bleeding off the bottom (Zajno) */
   .act-title { position: absolute; z-index: 6; left: 0; right: 0; bottom: -0.16em;
     text-align: center; font-weight: 900; text-transform: uppercase; white-space: nowrap;
-    font-size: clamp(80px, 9.5vw, 200px); letter-spacing: -.03em; line-height: 1;
+    font-size: clamp(40px, 9.5vw, 200px); letter-spacing: -.03em; line-height: 1;
     color: #fff; opacity: .95; pointer-events: none; text-shadow: 0 2px 30px rgba(0,0,0,.45); }
   .act-kicker { position: absolute; z-index: 6; left: var(--edge); bottom: calc(7svh + 64px);
     color: #fff; max-width: 40ch; }
@@ -79,7 +79,7 @@
     padding: 0 var(--edge) 10svh; border-top: 1px solid #1c1c1c; position: relative; overflow: hidden; }
   .finale .giant { position: absolute; left: 0; right: 0; bottom: -0.16em; text-align: center;
     font-weight: 900; text-transform: uppercase; white-space: nowrap; line-height: 1;
-    font-size: clamp(80px, 9.5vw, 200px); letter-spacing: -.03em; color: #111; pointer-events: none; }
+    font-size: clamp(40px, 9.5vw, 200px); letter-spacing: -.03em; color: #111; pointer-events: none; }
   .finale h2 { font-size: clamp(38px, 6vw, 96px); font-weight: 800; text-transform: uppercase;
     letter-spacing: -.02em; line-height: .95; margin-bottom: 20px; position: relative; }
   .finale p { color: #bdbdbd; max-width: 52ch; font-size: 17px; line-height: 1.65; margin-bottom: 34px; position: relative; }
@@ -94,6 +94,10 @@
     .hud .left { display: none; }
     .act-kicker { right: var(--edge); }
     .reel .meta.bl, .reel .meta.br { display: none; }
+    /* Mobile: the film is a true 16:9 cinema frame, never a cropped full-bleed */
+    .reel canvas, .reel .grade { inset: auto; top: 15svh; left: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .reel .meta.tl, .reel .meta.tr { top: calc(15svh + (100vw * 9 / 16) + 18px); }
+    .act-kicker { bottom: calc(7svh + 96px); }
   }
 </style>
 </head>
