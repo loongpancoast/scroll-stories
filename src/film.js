@@ -60,8 +60,14 @@ export class Film {
     if (!img) return;
     const c = this.canvas, x = this.ctx;
     const cw = c.width, ch = c.height;
-    const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    // Portrait viewport (mobile): contain-fit so the 16:9 film is never cropped.
+    // Landscape/desktop: cover-fit for the full-bleed cinematic frame.
+    const s = ch > cw
+      ? Math.min(cw / img.naturalWidth, ch / img.naturalHeight)
+      : Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
     const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+    x.fillStyle = '#000';
+    x.fillRect(0, 0, cw, ch);
     x.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }
 
