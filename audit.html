@@ -4,239 +4,170 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Golf Fitness Audit — The Unfold</title>
-<meta name="description" content="Two movement screens, one continuous film. Scroll opens the viewfinder and the audit unfolds frame by frame.">
+<meta name="description" content="A spatial storytelling audit: three screens, one golfer. Mobility, power, recovery — unfolded.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/src/shared.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root { --edge: clamp(20px, 5vw, 90px); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { background: #000; }
-  body { background: #000; color: #f2f2f2; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
+  html { background: #050505; }
+  body { background: #050505; color: #f0ede8; font-family: 'Inter Tight', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
-  .col { max-width: 1560px; margin: 0 auto; padding-left: var(--edge); padding-right: var(--edge); }
+  img { display: block; max-width: 100%; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px); }
 
-  /* ---- Viewfinder frame (Clipzo) ---- */
+  /* ---------- Hero viewfinder: the Clipzo frame ---------- */
+  .hero { padding: 5vh 0 0; }
   .vf { position: relative; border: 1px solid rgba(255,255,255,.22); }
-  .vf .corner { position: absolute; width: 22px; height: 22px; border: 0 solid #fff; z-index: 6; }
-  .vf .corner.tl { top: -8px; left: -8px; border-top-width: 2px; border-left-width: 2px; }
-  .vf .corner.tr { top: -8px; right: -8px; border-top-width: 2px; border-right-width: 2px; }
-  .vf .corner.bl { bottom: -8px; left: -8px; border-bottom-width: 2px; border-left-width: 2px; }
-  .vf .corner.br { bottom: -8px; right: -8px; border-bottom-width: 2px; border-right-width: 2px; }
+  .vf .corner { position: absolute; width: 26px; height: 26px; z-index: 3; }
+  .vf .corner.tl { top: -1px; left: -1px; border-top: 3px solid #fff; border-left: 3px solid #fff; }
+  .vf .corner.tr { top: -1px; right: -1px; border-top: 3px solid #fff; border-right: 3px solid #fff; }
+  .vf .corner.bl { bottom: -1px; left: -1px; border-bottom: 3px solid #fff; border-left: 3px solid #fff; }
+  .vf .corner.br { bottom: -1px; right: -1px; border-bottom: 3px solid #fff; border-right: 3px solid #fff; }
+  .vf img.ph { width: 100%; aspect-ratio: 16 / 8.2; object-fit: cover; }
+  .vf .title { position: absolute; top: 7%; right: 4%; z-index: 2; text-align: right;
+    font-size: clamp(44px, 6.4vw, 104px); font-weight: 800; text-transform: uppercase;
+    line-height: .94; letter-spacing: -.02em; text-shadow: 0 2px 24px rgba(0,0,0,.55); }
+  .vf .globe { position: absolute; left: 4%; bottom: 9%; z-index: 2; width: 58px; height: 58px;
+    border: 1.5px solid rgba(255,255,255,.85); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; }
+  .vf .globe svg { width: 30px; height: 30px; }
+  .vf .ruler { position: absolute; left: 50%; transform: translateX(-50%); bottom: 7%; z-index: 2;
+    display: flex; gap: 34px; align-items: flex-end; }
+  .vf .ruler .tick { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #e8e4dc; }
+  .vf .ruler .tick i { display: block; width: 1px; height: 34px; background: rgba(255,255,255,.7); }
+  .vf .ruler .tick.dim { opacity: .55; }
 
-  /* ---- Hero: the master viewfinder ---- */
-  .hero { padding: 110px 0 60px; }
-  .hero .vf { height: 74svh; overflow: hidden; }
-  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35), transparent 35%, transparent 65%, rgba(0,0,0,.6)); pointer-events: none; }
-  .hero .title { position: absolute; top: 8%; right: 6%; z-index: 5; text-align: right;
-    font-size: clamp(48px, 7vw, 120px); font-weight: 900; line-height: .92; letter-spacing: -.02em;
-    text-transform: uppercase; }
-  .hero .ruler { position: absolute; z-index: 5; left: 0; right: 0; bottom: 5%; display: flex;
-    justify-content: center; align-items: flex-end; gap: 0; }
-  .hero .ruler .tick { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 90px; color: #cfcfcf; }
-  .hero .ruler .tick i { display: block; width: 1px; height: 26px; background: rgba(255,255,255,.5); }
-  .hero .ruler .tick.on { color: #fff; }
-  .hero .ruler .tick.on i { background: #fff; height: 40px; }
-  .hero .globe { position: absolute; z-index: 5; left: 4%; bottom: 5%; width: 54px; height: 54px;
-    border: 1.5px solid #fff; border-radius: 50%; display: grid; place-items: center; }
-  .hero .globe::before { content: ""; width: 26px; height: 26px; border: 1.5px solid #fff; border-radius: 50%;
-    background: repeating-linear-gradient(90deg, transparent 0 7px, #fff 7px 8.5px); }
+  /* ---------- Editorial row ---------- */
+  .ed { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 9vh 0; align-items: start; }
+  .strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .strip img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid rgba(255,255,255,.14); }
+  .ed .copy .n { color: #8f8a81; display: block; margin-bottom: 16px; }
+  .ed .copy h2 { font-size: clamp(34px, 4.6vw, 68px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .96; margin-bottom: 18px; }
+  .ed .copy p { color: #b9b3a8; font-size: 16.5px; line-height: 1.7; margin-bottom: 14px; max-width: 46ch; }
+  .cta-row { display: flex; justify-content: center; padding: 2vh 0 10vh; }
+  .brackets { display: inline-block; position: relative; color: #fff; text-decoration: none;
+    font-family: 'Space Mono', monospace; font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+    padding: 22px 54px; font-weight: 700; }
+  .brackets::before, .brackets::after { content: ""; position: absolute; top: 0; bottom: 0; width: 22px; }
+  .brackets::before { left: 0; border-top: 2px solid #fff; border-bottom: 2px solid #fff; border-left: 2px solid #fff; }
+  .brackets::after { right: 0; border-top: 2px solid #fff; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
+  .brackets:hover { background: rgba(255,255,255,.06); }
 
-  /* ---- Filmstrip + editorial (Clipzo lower block) ---- */
-  .strip { display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; padding: 54px 0 30px; align-items: start; }
-  .thumbs { display: flex; gap: 18px; }
-  .thumb { position: relative; width: 150px; cursor: pointer; border: 1px solid rgba(255,255,255,.18); }
-  .thumb img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; opacity: .55; }
-  .thumb.on img { opacity: 1; }
-  .thumb .corner { width: 14px; height: 14px; }
-  .thumb:not(.on) .corner { display: none; }
-  .thumb .cap { margin-top: 10px; color: #8a8a8a; }
-  .thumb.on .cap { color: #fff; }
-  .edito { font-size: clamp(26px, 3.2vw, 52px); font-weight: 500; line-height: 1.18; letter-spacing: -.01em; }
-  .edito b { font-weight: 800; }
+  /* ---------- Screens ---------- */
+  .screens { border-top: 1px solid rgba(255,255,255,.1); padding: 10vh 0; display: grid; gap: 9vh; }
+  .screen .vf img.ph { aspect-ratio: 16 / 7; }
+  .screen .cap { display: flex; justify-content: space-between; gap: 16px; margin-top: 18px; }
+  .screen .cap h3 { font-size: clamp(24px, 3vw, 40px); font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; }
+  .screen .cap p { color: #b9b3a8; font-size: 15.5px; line-height: 1.65; max-width: 44ch; text-align: right; }
+  .screen .cap .n { color: #8f8a81; display: block; margin-bottom: 8px; }
 
-  /* ---- Screens ---- */
-  .screen { padding: 12svh 0; }
-  .screen .vf { height: 68svh; overflow: hidden; clip-path: inset(12% 8% 12% 8%); }
-  .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .screen .tag { position: absolute; z-index: 5; top: 7%; left: 5%; color: #fff; }
-  .screen .body { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding-top: 44px; align-items: start; }
-  .screen h2 { font-size: clamp(34px, 4.6vw, 76px); font-weight: 800; text-transform: uppercase;
-    letter-spacing: -.02em; line-height: .98; }
-  .screen .copy p { color: #bdbdbd; font-size: 17px; line-height: 1.7; margin-bottom: 16px; }
-  .screen .copy ul { list-style: none; margin-top: 20px; display: grid; gap: 12px; }
-  .screen .copy li { display: flex; gap: 14px; color: #d8d8d8; font-size: 15.5px; line-height: 1.55; }
-  .screen .copy li::before { content: "→"; color: #fff; flex: none; }
+  .finale { border-top: 1px solid rgba(255,255,255,.1); padding: 12vh 0; text-align: center; }
+  .finale h2 { font-size: clamp(38px, 5.6vw, 88px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .96; margin-bottom: 18px; }
+  .finale p { color: #b9b3a8; font-size: 16.5px; line-height: 1.7; max-width: 52ch; margin: 0 auto 40px; }
+  .foot { display: flex; justify-content: space-between; gap: 12px; padding: 26px clamp(20px, 4vw, 64px) 34px;
+    color: #6f6a61; border-top: 1px solid rgba(255,255,255,.08); max-width: 1180px; margin: 0 auto; }
 
-  /* ---- CTA (corner-bracket button, Clipzo) ---- */
-  .cta-row { display: flex; justify-content: center; padding: 40px 0 20px; }
-  .btn-bracket { position: relative; display: inline-flex; align-items: center; gap: 0;
-    color: #fff; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 13px;
-    letter-spacing: .12em; text-transform: uppercase; padding: 22px 58px 22px 34px; }
-  .btn-bracket .corner { position: absolute; width: 16px; height: 16px; border: 0 solid #fff; }
-  .btn-bracket .corner.tl { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
-  .btn-bracket .corner.tr { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
-  .btn-bracket .corner.bl { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
-  .btn-bracket .corner.br { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
-  .btn-bracket .arr { position: absolute; right: 22px; }
-
-  .finale { text-align: center; padding: 10svh 0 12svh; }
-  .finale .micro { color: #8a8a8a; margin-top: 34px; }
-  .foot { display: flex; justify-content: space-between; padding: 26px var(--edge) 34px;
-    color: #6f6f6f; border-top: 1px solid #161616; max-width: 1560px; margin: 0 auto; }
-
-  @media (max-width: 900px) {
-    .strip { grid-template-columns: 1fr; }
-    .screen .body { grid-template-columns: 1fr; }
-    .hero .title { font-size: 10.5vw; top: 6%; right: 5%; }
-    .hero .ruler .tick { width: 64px; font-size: 8px; }
-    .hero .globe { width: 38px; height: 38px; left: 5%; bottom: 8%; }
-    /* Mobile: viewfinders hug the 16:9 film exactly (Clipzo frame = image frame) */
-    .hero .vf, .screen .vf { height: auto; aspect-ratio: 16 / 9; }
-    .hero { padding-top: 84px; }
+  @media (max-width: 760px) {
+    .vf img.ph { aspect-ratio: 16 / 12; }
+    .vf .title { font-size: 12.5vw; top: 6%; }
+    .vf .globe { width: 40px; height: 40px; }
+    .vf .ruler { gap: 18px; bottom: 6%; }
+    .vf .ruler .tick { font-size: 8px; }
+    .vf .ruler .tick i { height: 22px; }
+    .ed { grid-template-columns: 1fr; gap: 34px; }
+    .screen .cap { flex-direction: column; }
+    .screen .cap p { text-align: left; }
   }
 </style>
 </head>
 <body>
 
-<div class="col">
+<div class="wrap">
   <section class="hero">
-    <div class="vf" id="heroVf">
-      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <canvas id="heroFilm"></canvas>
-      <div class="shade"></div>
-      <div class="title">Golf<br>Fitness<br>Audit</div>
-      <div class="globe"></div>
-      <div class="ruler mono" id="ruler">
-        <span class="tick" data-i="0">Screen 01<i></i></span>
-        <span class="tick" data-i="1">Dissolve<i></i></span>
-        <span class="tick" data-i="2">Screen 02<i></i></span>
+    <div class="vf">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <img class="ph" src="/stills/audit-hero.jpg" alt="Golfer training with a club across his shoulders in a dark gym">
+      <h1 class="title">Golf<br>Fitness<br>Audit</h1>
+      <div class="globe">
+        <svg viewBox="0 0 30 30" fill="none" stroke="#fff" stroke-width="1.4">
+          <circle cx="15" cy="15" r="9"/><path d="M6,15 H24 M15,6 C19,10 19,20 15,24 C11,20 11,10 15,6"/>
+        </svg>
+      </div>
+      <div class="ruler mono">
+        <div class="tick"><span>Screen 01</span><i></i></div>
+        <div class="tick dim"><span>Dissolve</span><i></i></div>
+        <div class="tick"><span>Screen 02</span><i></i></div>
       </div>
     </div>
+  </section>
 
+  <section class="ed">
     <div class="strip">
-      <div class="thumbs">
-        <div class="thumb on" data-goto="s1">
-          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-          <img src="/films/audit/f_001.jpg" alt="Rotation screen">
-          <div class="cap mono">01 — Rotation</div>
-        </div>
-        <div class="thumb" data-goto="s2">
-          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-          <img src="/films/audit/f_057.jpg" alt="Stretch screen">
-          <div class="cap mono">02 — Hinge</div>
-        </div>
-      </div>
-      <p class="edito">We <b>screen the movement</b> behind the swing fault — then give you drills for <b>that limiter only.</b> One continuous film, two screens, zero guesswork.</p>
+      <img src="/stills/audit-thumb1.jpg" alt="Training still one">
+      <img src="/stills/audit-thumb2.jpg" alt="Training still two">
+      <img src="/stills/audit-hero.jpg" alt="Training still three">
+    </div>
+    <div class="copy">
+      <span class="n mono">Spatial storytelling — the unfold</span>
+      <h2>Your body is the equipment.</h2>
+      <p>Every golfer upgrades the clubs. Almost nobody audits the body swinging them. The Golf Fitness Audit reads your movement the way a coach reads a swing — three screens, each one opening the next.</p>
+      <p>What limits your rotation, where your power actually leaks, and what your recovery is hiding. No generic workout plan. A reading of <em>your</em> chassis.</p>
     </div>
   </section>
 
-  <section class="screen" id="s1">
-    <div class="vf" data-vf>
-      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <canvas data-film="a"></canvas>
-      <div class="tag mono">Screen 01 — Thoracic rotation</div>
-    </div>
-    <div class="body">
-      <h2>Stretching is not screening.</h2>
-      <div class="copy">
-        <p>Stretching what feels tight is not the same as screening what restricts. The audit finds the actual limiter behind your swing fault, then gives you drills for that limiter only.</p>
-        <p>If your slice comes from your body stalling in the downswing, you will see exactly where. If it is a club path issue instead, it will tell you that too — so you stop chasing the wrong fix.</p>
-        <ul>
-          <li>Seated rotation test — left vs right, measured in degrees</li>
-          <li>Overhead squat — where the chain actually breaks</li>
-          <li>Single-leg balance — the quiet killer of consistency</li>
-        </ul>
+  <div class="cta-row">
+    <a class="brackets" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">Start my audit</a>
+  </div>
+
+  <section class="screens">
+    <div class="screen">
+      <div class="vf">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <img class="ph" src="/stills/audit-thumb1.jpg" alt="Screen one — mobility">
+      </div>
+      <div class="cap">
+        <div><span class="n mono">Screen 01</span><h3>Mobility</h3></div>
+        <p>Can your hips and thoracic spine actually make a full turn? Most distance leaks start here — the body stops rotating, so the arms take over, and the swing gets long instead of fast.</p>
       </div>
     </div>
-  </section>
-
-  <section class="screen" id="s2">
-    <div class="vf" data-vf>
-      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <canvas data-film="b"></canvas>
-      <div class="tag mono">Screen 02 — Hip hinge</div>
+    <div class="screen">
+      <div class="vf">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <img class="ph" src="/stills/audit-thumb2.jpg" alt="Screen two — power">
+      </div>
+      <div class="cap">
+        <div><span class="n mono">Screen 02</span><h3>Power</h3></div>
+        <p>Where does your speed come from — the ground or your hands? The audit maps your force sequence and finds the link that is not firing.</p>
+      </div>
     </div>
-    <div class="body">
-      <h2>Your body is the first coach.</h2>
-      <div class="copy">
-        <p>Every swing fault has a body behind it. Early extension, loss of posture, the slide — these are not swing problems first. They are movement problems wearing a swing costume.</p>
-        <p>The audit films two screens, scores them against the patterns that actually correlate with ball-striking, and hands you the three drills that move your number — not a generic mobility program.</p>
-        <ul>
-          <li>Hip hinge screen — can you load without losing spine angle</li>
-          <li>Personal drill prescription — three moves, not thirty</li>
-          <li>Re-screen in 30 days — the number moves or the plan changes</li>
-        </ul>
+    <div class="screen">
+      <div class="vf">
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+        <img class="ph" src="/stills/audit-hero.jpg" alt="Screen three — recovery">
+      </div>
+      <div class="cap">
+        <div><span class="n mono">Screen 03</span><h3>Recovery</h3></div>
+        <p>You do not get better from training. You get better from recovering from training. The third screen reads what your soreness, sleep, and warm-up are telling you.</p>
       </div>
     </div>
   </section>
 
   <section class="finale">
-    <div class="cta-row">
-      <a class="btn-bracket" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">
-        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-        Start my audit <span class="arr">↗</span>
-      </a>
-    </div>
-    <div class="micro mono">Films, scores & drills — the full audit</div>
+    <h2>Know your chassis.</h2>
+    <p>The Golf Fitness Audit is the full three-screen reading: mobility, power, recovery — measured against what your swing actually needs. Film three short movements, get the unfold.</p>
+    <a class="brackets" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">Start my audit</a>
   </section>
 </div>
 
-<footer class="foot mono"><span>The Unfold — a DriveOn screening</span><span>02 screens / 01 film</span></footer>
+<footer class="foot mono"><span>The Unfold — a DriveOn audit</span><span>03 screens / 01 golfer</span></footer>
 
-<script type="module">
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Film } from '/src/film.js';
-gsap.registerPlugin(ScrollTrigger);
-
-const COUNT = 113;
-// Hero: the whole continuous film scrubbed by scroll (the master viewfinder)
-const heroFilm = new Film(document.getElementById('heroFilm'), 'audit', COUNT);
-
-const ticks = [...document.querySelectorAll('#ruler .tick')];
-ScrollTrigger.create({
-  trigger: '.hero', start: 'top top', end: '+=220%',
-  pin: '.hero .vf', scrub: true,
-  onUpdate(self) {
-    const p = self.progress;
-    heroFilm.draw(p);
-    const seg = p < 0.4 ? 0 : p < 0.6 ? 1 : 2;
-    ticks.forEach((t, i) => t.classList.toggle('on', i === seg));
-  }
-});
-
-// Screens: each viewfinder unfolds, its film segment loops inside
-const segs = [[0, 56], [57, 112]];
-document.querySelectorAll('[data-vf]').forEach((vf, i) => {
-  gsap.fromTo(vf, { clipPath: 'inset(12% 8% 12% 8%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
-    scrollTrigger: { trigger: vf, start: 'top 80%', end: 'top 30%', scrub: true } });
-  const film = new Film(vf.querySelector('[data-film]'), 'audit', COUNT);
-  const [from, to] = segs[i];
-  ScrollTrigger.create({
-    trigger: vf, start: 'top 85%', end: 'bottom 15%',
-    onEnter: () => film.play(from, to, 6), onEnterBack: () => film.play(from, to, 6),
-    onLeave: () => film.stop(), onLeaveBack: () => film.stop(),
-  });
-});
-
-// Thumbnail jump links
-document.querySelectorAll('.thumb').forEach(th => {
-  th.addEventListener('click', () => {
-    document.querySelectorAll('.thumb').forEach(x => x.classList.remove('on'));
-    th.classList.add('on');
-    document.getElementById(th.dataset.goto).scrollIntoView({ behavior: 'smooth' });
-  });
-});
-
-// Copy reveals
-gsap.utils.toArray('.screen .body > *').forEach(el => {
-  gsap.from(el, { y: 44, opacity: 0, duration: .9, ease: 'power3.out',
-    scrollTrigger: { trigger: el, start: 'top 82%' } });
-});
-gsap.from('.edito', { y: 40, opacity: 0, duration: 1, ease: 'power3.out',
-  scrollTrigger: { trigger: '.strip', start: 'top 80%' } });
-</script>
 </body>
 </html>
