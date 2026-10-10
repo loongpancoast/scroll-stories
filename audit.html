@@ -89,7 +89,12 @@
   @media (max-width: 900px) {
     .strip { grid-template-columns: 1fr; }
     .screen .body { grid-template-columns: 1fr; }
-    .hero .title { font-size: 15vw; }
+    .hero .title { font-size: 10.5vw; top: 6%; right: 5%; }
+    .hero .ruler .tick { width: 64px; font-size: 8px; }
+    .hero .globe { width: 38px; height: 38px; left: 5%; bottom: 8%; }
+    /* Mobile: viewfinders hug the 16:9 film exactly (Clipzo frame = image frame) */
+    .hero .vf, .screen .vf { height: auto; aspect-ratio: 16 / 9; }
+    .hero { padding-top: 84px; }
   }
 </style>
 </head>
