@@ -3,186 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The College Golf Recruiting Roadmap — The Reel</title>
-<meta name="description" content="A cinematic briefing for golf parents. Scroll runs the projector: three acts, one continuous film, one roadmap.">
+<title>The Recruiting Roadmap — The Reel</title>
+<meta name="description" content="A cinematic briefing for golf parents: what coaches actually evaluate, the contact timeline, and the fit filter.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/src/shared.css">
 <style>
   :root { --edge: clamp(20px, 4vw, 64px); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { background: #000; }
-  body { background: #000; color: #f2f2f2; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
+  body { background: #000; color: #f2f2f2; font-family: 'Inter Tight', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  img { display: block; max-width: 100%; }
 
-  /* ---- HUD: Zajno top bar, exact ---- */
-  .hud { position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-    display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 26px var(--edge); mix-blend-mode: difference; pointer-events: none; }
-  .hud .left { line-height: 1.9; opacity: .85; }
-  .hud .left .tc { color: #fff; opacity: 1; }
-  .hud .wordmark { font-weight: 900; letter-spacing: .42em; font-size: 15px; text-indent: .42em; }
-  .hud .right { text-align: right; line-height: 1.9; opacity: .85; }
-  .hud .right a { color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 2px; pointer-events: auto; }
+  /* ---------- HUD ---------- */
+  .hud { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 26px var(--edge); }
+  .hud .left { line-height: 1.9; color: #cfcfcf; }
+  .hud .wordmark { font-weight: 900; letter-spacing: .42em; text-indent: .42em; font-size: 15px; color: #fff; }
+  .hud .right { text-align: right; line-height: 1.9; color: #cfcfcf; }
+  .hud .right a { color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 2px; }
+  .hud .right a:hover { opacity: .7; }
 
-  /* ---- Reel: the Zajno viewport. Pin IS the first screen. ---- */
-  .reel-wrap { height: 700vh; position: relative; }
-  .reel { position: sticky; top: 0; height: 100svh; overflow: hidden; background: #000; }
-  .reel canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .reel .grade { position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgba(0,0,0,.5), transparent 24%, transparent 60%, rgba(0,0,0,.82)); }
-
-  /* giant act title bleeding off the bottom — Zajno */
-  .act-title { position: absolute; z-index: 5; left: 0; right: 0; bottom: -0.16em;
+  /* ---------- Hero: the Zajno viewport ---------- */
+  .hero { position: relative; height: calc(100svh - 96px); min-height: 560px; overflow: hidden; }
+  .hero img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero .grade { position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.45), transparent 30%, transparent 55%, rgba(0,0,0,.85)); }
+  .hero .lede { position: absolute; left: var(--edge); bottom: 27%; max-width: 42ch; z-index: 3; }
+  .hero .lede .n { color: #9a9a9a; display: block; margin-bottom: 12px; }
+  .hero .lede p { color: #d6d6d6; font-size: 16px; line-height: 1.65; }
+  .hero .giant { position: absolute; left: 0; right: 0; bottom: -0.17em; z-index: 2;
     text-align: center; font-weight: 900; text-transform: uppercase; white-space: nowrap;
-    font-size: clamp(40px, 9.5vw, 200px); letter-spacing: -.03em; line-height: 1;
-    color: #fff; opacity: .95; pointer-events: none; text-shadow: 0 2px 30px rgba(0,0,0,.45); }
-
-  /* act story block, bottom-left above the status line */
-  .act-story { position: absolute; z-index: 6; left: var(--edge); bottom: 165px; max-width: 40ch; }
-  .act-story .n { color: #8a8a8a; display: block; margin-bottom: 10px; }
-  .act-story p { color: #c9c9c9; font-size: 15px; line-height: 1.6; }
-
-  /* corner status labels — Zajno bottom row */
-  .status { position: absolute; z-index: 6; bottom: 30px; display: flex; gap: 12px; align-items: center; color: #cfcfcf; }
-  .status.bl { left: var(--edge); }
-  .status.br { right: var(--edge); }
+    font-size: clamp(40px, 9.8vw, 200px); letter-spacing: -.03em; line-height: 1; color: #fff; }
+  .hero .status { position: absolute; bottom: 30px; z-index: 3; display: flex; gap: 12px;
+    align-items: center; color: #cfcfcf; }
+  .hero .status.bl { left: var(--edge); }
+  .hero .status.br { right: var(--edge); }
   .orbit { width: 26px; height: 26px; border: 1px solid #6f6f6f; border-radius: 50%; position: relative; flex: none; }
-  .orbit::after { content: ""; position: absolute; inset: 5px; border: 1px solid #6f6f6f; border-radius: 50%;
-    border-top-color: transparent; animation: spin 3s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .cue { display: none; }
+  .orbit::after { content: ""; position: absolute; inset: 5px; border: 1px solid #9a9a9a;
+    border-radius: 50%; border-top-color: transparent; }
 
-  /* ---- Chapters ---- */
-  .chapters { padding: 16svh var(--edge); display: grid; gap: 14svh; max-width: 1200px; }
-  .chap .n { color: #8a8a8a; margin-bottom: 14px; display: block; }
-  .chap h3 { font-size: clamp(30px, 4.4vw, 62px); font-weight: 800; text-transform: uppercase;
-    letter-spacing: -.015em; line-height: 1; margin-bottom: 16px; }
-  .chap p { color: #bdbdbd; font-size: 17px; line-height: 1.7; max-width: 56ch; }
+  /* ---------- Chapters ---------- */
+  .chapters { max-width: 1200px; padding: 16vh var(--edge); display: grid; gap: 13vh; }
+  .chap .n { color: #8a8a8a; display: block; margin-bottom: 16px; }
+  .chap h2 { font-size: clamp(34px, 5vw, 72px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .98; margin-bottom: 18px; }
+  .chap p { color: #bdbdbd; font-size: 17px; line-height: 1.7; max-width: 58ch; }
+  .chap figure { margin-top: 34px; }
+  .chap figure img { width: 100%; aspect-ratio: 16 / 8; object-fit: cover; }
+  .chap figcaption { color: #6f6f6f; margin-top: 10px; }
 
-  /* ---- Finale ---- */
-  .finale { min-height: 92svh; display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 var(--edge) 10svh; border-top: 1px solid #1c1c1c; position: relative; overflow: hidden; }
-  .finale .giant { position: absolute; left: 0; right: 0; bottom: -0.16em; text-align: center;
+  /* ---------- Finale ---------- */
+  .finale { position: relative; overflow: hidden; border-top: 1px solid #1c1c1c;
+    padding: 14vh var(--edge) 16vh; }
+  .finale .giant { position: absolute; left: 0; right: 0; bottom: -0.17em; text-align: center;
     font-weight: 900; text-transform: uppercase; white-space: nowrap; line-height: 1;
-    font-size: clamp(40px, 9.5vw, 200px); letter-spacing: -.03em; color: #111; pointer-events: none; }
-  .finale h2 { font-size: clamp(38px, 6vw, 96px); font-weight: 800; text-transform: uppercase;
-    letter-spacing: -.02em; line-height: .95; margin-bottom: 20px; position: relative; }
-  .finale p { color: #bdbdbd; max-width: 52ch; font-size: 17px; line-height: 1.65; margin-bottom: 34px; position: relative; }
-  .btn { display: inline-flex; align-items: center; gap: 14px; color: #000; background: #fff;
-    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
-    padding: 20px 34px; text-decoration: none; font-weight: 700; position: relative; }
+    font-size: clamp(40px, 9.8vw, 200px); letter-spacing: -.03em; color: #141414; pointer-events: none; }
+  .finale .kick { color: #8a8a8a; margin-bottom: 20px; position: relative; }
+  .finale h2 { font-size: clamp(40px, 6.4vw, 104px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .95; margin-bottom: 22px; position: relative; }
+  .finale p { color: #bdbdbd; max-width: 54ch; font-size: 17px; line-height: 1.65; margin-bottom: 36px; position: relative; }
+  .btn { display: inline-block; color: #000; background: #fff; font-family: 'Space Mono', monospace;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 20px 36px;
+    text-decoration: none; font-weight: 700; position: relative; }
   .btn:hover { background: #d8d8d8; }
-  .foot { display: flex; justify-content: space-between; padding: 26px var(--edge) 34px;
+  .foot { display: flex; justify-content: space-between; gap: 12px; padding: 26px var(--edge) 34px;
     color: #6f6f6f; border-top: 1px solid #161616; }
 
   @media (max-width: 720px) {
     .hud .left .sub { display: none; }
-    .act-story { top: calc(14svh + 100vw * 9 / 16 + 24px); bottom: auto; left: var(--edge); right: var(--edge); }
-    .act-story p { display: none; }
-    .status.br { display: none; }
-    .reel canvas, .reel .grade { inset: auto; top: 14svh; left: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .hero { height: auto; min-height: 0; display: flex; flex-direction: column; }
+    .hero img.bg { position: relative; inset: auto; aspect-ratio: 16 / 9; height: auto; }
+    .hero .grade { display: none; }
+    .hero .lede { position: static; padding: 26px var(--edge) 0; }
+    .hero .giant { position: static; font-size: 12vw; letter-spacing: -.04em; margin-top: 18px; }
+    .hero .status { position: static; padding: 18px var(--edge) 26px; }
+    .hero .status.br { display: none; }
   }
 </style>
 </head>
 <body>
 
 <header class="hud">
-  <div class="left mono">College golf recruiting<br><span class="sub">Cycle • 2025–26 — Reel 01<br></span><span class="tc" id="tc">TC 00:00:00:00</span></div>
+  <div class="left mono">College golf recruiting<br><span class="sub">Cycle • 2025–26</span></div>
   <div class="wordmark">THE&nbsp;REEL</div>
-  <div class="right mono">Reel 01 / 01<br><a href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a></div>
+  <div class="right mono"><a href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a></div>
 </header>
 
-<div class="reel-wrap" id="reelWrap">
-  <div class="reel" id="reel">
-    <canvas id="film"></canvas>
-    <div class="grade"></div>
-    <div class="act-story" id="actStory">
-      <span class="n mono" id="actN">Act I — 00:00</span>
-      <p id="actP">For most families, recruiting starts with a question nobody can answer: is my kid actually good enough to play in college? Here is the honest frame — what coaches look at first, and why the highlight reel is the last thing that matters.</p>
-    </div>
-    <div class="act-title" id="actTitle">The Invitation</div>
-    <div class="status bl mono"><span class="orbit"></span>Screening: active</div>
-    <div class="cue mono">Scroll</div>
-    <div class="status br mono">All systems: active</div>
+<section class="hero">
+  <img class="bg" src="/stills/roadmap-aerial.jpg" alt="Aerial view of a golf course at dawn">
+  <div class="grade"></div>
+  <div class="lede">
+    <span class="n mono">A briefing for golf parents — three acts</span>
+    <p>For most families, recruiting starts with a question nobody can answer: is my kid actually good enough to play in college? Here is the honest frame — what coaches look at first, and why the highlight reel is the last thing that matters.</p>
   </div>
-</div>
+  <div class="giant">The Roadmap</div>
+  <div class="status bl mono"><span class="orbit"></span>Screening: active</div>
+  <div class="status br mono">All systems: active</div>
+</section>
 
 <section class="chapters">
   <div class="chap">
-    <span class="n mono">Chapter 01 — After the film</span>
-    <h3>Coaches recruit scorecards, not swings.</h3>
+    <span class="n mono">Act I — The invitation</span>
+    <h2>Coaches recruit scorecards, not swings.</h2>
     <p>The first filter is brutally simple: can this kid shoot the number, on real courses, under pressure, more than once? Everything in the roadmap starts there — building a tournament schedule that produces a scorecard a coach can trust, instead of a swing video a coach will skim.</p>
+    <figure>
+      <img src="/stills/roadmap-sunset.jpg" alt="Golfer at sunset preparing to tee off">
+      <figcaption class="mono">Fig. 01 — Tournament golf, where the evaluation actually happens</figcaption>
+    </figure>
   </div>
   <div class="chap">
-    <span class="n mono">Chapter 02 — The window</span>
-    <h3>Recruiting has a clock. Most families start it late.</h3>
+    <span class="n mono">Act II — The standard</span>
+    <h2>Recruiting has a clock. Most families start it late.</h2>
     <p>Coaches build their boards years out. The roadmap lays the contact timeline against your graduation year — when film goes out, when calls happen, when visits matter — so you are early instead of apologizing for being late.</p>
   </div>
   <div class="chap">
-    <span class="n mono">Chapter 03 — The decision</span>
-    <h3>Fit beats prestige. Every time.</h3>
+    <span class="n mono">Act III — The decision</span>
+    <h2>Fit beats prestige. Every time.</h2>
     <p>The right program is the one where your game gets better and your degree means something. The roadmap ends with a fit filter — coaching style, playing opportunity, academics, cost — so the choice is a decision, not a gamble.</p>
   </div>
 </section>
 
 <section class="finale">
   <div class="giant">Roadmap</div>
-  <div class="kick mono" style="color:#8a8a8a;margin-bottom:18px;position:relative">The full briefing — $49</div>
+  <div class="kick mono">The full briefing — $49</div>
   <h2>Get recruited<br>on purpose.</h2>
-  <p>The Recruiting Roadmap is the complete version of this film: the timeline, the contact scripts, the tournament plan, and the fit filter — everything a golf parent needs to run the process like a program, not a hope.</p>
-  <div><a class="btn" href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a></div>
+  <p>The Recruiting Roadmap is the complete version of this briefing: the timeline, the contact scripts, the tournament plan, and the fit filter — everything a golf parent needs to run the process like a program, not a hope.</p>
+  <a class="btn" href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a>
 </section>
 
-<footer class="foot mono"><span>The Reel — a DriveOn briefing</span><span>Reel 01 / 03 acts</span></footer>
+<footer class="foot mono"><span>The Reel — a DriveOn briefing</span><span>Briefing 01 / 03 acts</span></footer>
 
-<script type="module">
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Film } from '/src/film.js';
-gsap.registerPlugin(ScrollTrigger);
-
-const COUNT = 113, FPS = 6, DUR = COUNT / FPS;
-const film = new Film(document.getElementById('film'), 'roadmap', COUNT);
-const tc = document.getElementById('tc');
-const acts = [
-  { n: 'Act I — 00:00', t: 'The Invitation',
-    p: 'For most families, recruiting starts with a question nobody can answer: is my kid actually good enough to play in college? Here is the honest frame — what coaches look at first, and why the highlight reel is the last thing that matters.' },
-  { n: 'Act II — 00:09', t: 'The Standard',
-    p: 'The film dissolves to the fairway. This is the standard: tournament scorecards on real courses, a contact timeline matched to your graduation year, and film that shows a coach what they actually evaluate.' },
-  { n: 'Act III — 00:16', t: 'The Roadmap',
-    p: 'The walk continues. The roadmap itself: the schedule, the scripts, the visits, the fit filter. A process you run — instead of a process that happens to you.' },
-];
-let cur = -1;
-function setAct(i) {
-  if (i === cur) return; cur = i;
-  const a = acts[i];
-  gsap.to(['#actStory', '#actTitle'], { opacity: 0, y: 14, duration: .28, ease: 'power2.in', onComplete() {
-    document.getElementById('actN').textContent = a.n;
-    document.getElementById('actP').textContent = a.p;
-    document.getElementById('actTitle').textContent = a.t;
-    gsap.to(['#actStory', '#actTitle'], { opacity: 1, y: 0, duration: .45, ease: 'power2.out' });
-  }});
-}
-function fmt(s) {
-  const f = Math.floor((s % 1) * 24);
-  s = Math.floor(s);
-  const p2 = (n) => String(n).padStart(2, '0');
-  return `TC 00:${p2(Math.floor(s / 60))}:${p2(s % 60)}:${p2(f)}`;
-}
-ScrollTrigger.create({
-  trigger: '#reelWrap', start: 'top top', end: 'bottom bottom', scrub: true,
-  onUpdate(self) {
-    const p = self.progress;
-    film.draw(p);
-    tc.textContent = fmt(p * DUR);
-    setAct(p < 0.45 ? 0 : p < 0.8 ? 1 : 2);
-  }
-});
-gsap.utils.toArray('.chap').forEach(el => {
-  gsap.from(el.children, { y: 44, opacity: 0, duration: .9, ease: 'power3.out', stagger: .1,
-    scrollTrigger: { trigger: el, start: 'top 78%' } });
-});
-</script>
 </body>
 </html>
