@@ -4,148 +4,237 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Golf Fitness Audit — The Unfold</title>
-<meta name="description" content="Your swing has a body problem. Scroll unfolds each movement screen while the story plays inside the frame.">
+<meta name="description" content="Two movement screens, one continuous film. Scroll opens the viewfinder and the audit unfolds frame by frame.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/shared.css">
 <style>
-  .hero { min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--edge) 12dvh; position: relative; }
-  .hero .kicker { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 28px; }
-  .hero h1 { font-size: clamp(64px, 11vw, 190px); }
-  .hero .sub { position: absolute; top: 22dvh; right: var(--edge); max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.65; }
-  .cue { position: absolute; bottom: 32px; left: var(--edge); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-  .status { position: absolute; bottom: 32px; right: var(--edge); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  :root { --edge: clamp(20px, 5vw, 90px); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #000; }
+  body { background: #000; color: #f2f2f2; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
+  .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .col { max-width: 1560px; margin: 0 auto; padding-left: var(--edge); padding-right: var(--edge); }
 
-  .scene { position: relative; padding: 18dvh 0; }
-  .unfold { position: relative; height: 92dvh; margin: 0 var(--edge); overflow: hidden;
-    clip-path: inset(38% 26% 38% 26%); }
-  .unfold video { position: absolute; inset: -12%; width: 124%; height: 124%; object-fit: cover; }
-  .unfold .shade { position: absolute; inset: 0; background: linear-gradient(#000000b9 0%, transparent 35%, transparent 60%, #000000d9 100%); }
-  .unfold .frame-tag { position: absolute; top: 24px; left: 24px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: #00000088; padding: 8px 12px; }
-  .copy { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 8vw; padding: 64px var(--edge) 0; }
-  .copy .sc { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); grid-column: 1 / -1; }
-  .copy h2 { font-size: clamp(48px, 7vw, 120px); grid-column: 1 / -1; max-width: 14ch; }
-  .copy .body { font-size: 16px; line-height: 1.65; color: var(--muted); max-width: 58ch; }
-  .copy .notes { display: grid; gap: 0; align-content: start; }
-  .copy .notes .n { border-top: 1px solid var(--line); padding: 18px 0; font-size: 14px; line-height: 1.65; color: var(--muted); }
-  .copy .notes .n b { display: block; color: var(--ink); font-weight: 400; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
-  .clips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 64px var(--edge) 0; }
-  .clips .clip { background: var(--black); padding: 28px 24px; }
-  .clips .clip b { display: block; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); margin-bottom: 12px; font-weight: 400; }
-  .clips .clip p { font-size: 14px; line-height: 1.6; color: var(--muted); }
+  /* ---- Viewfinder frame (Clipzo) ---- */
+  .vf { position: relative; border: 1px solid rgba(255,255,255,.22); }
+  .vf .corner { position: absolute; width: 22px; height: 22px; border: 0 solid #fff; z-index: 6; }
+  .vf .corner.tl { top: -8px; left: -8px; border-top-width: 2px; border-left-width: 2px; }
+  .vf .corner.tr { top: -8px; right: -8px; border-top-width: 2px; border-right-width: 2px; }
+  .vf .corner.bl { bottom: -8px; left: -8px; border-bottom-width: 2px; border-left-width: 2px; }
+  .vf .corner.br { bottom: -8px; right: -8px; border-bottom-width: 2px; border-right-width: 2px; }
 
-  .interlude { padding: 20dvh var(--edge); text-align: center; }
-  .interlude p.big { font-size: clamp(48px, 8vw, 140px); }
-  .interlude .g { margin: 40px auto 0; max-width: 60ch; color: var(--muted); font-size: 15px; line-height: 1.7; text-align: center; }
-  .interlude .g b { color: var(--ink); font-weight: 400; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; display: block; margin-bottom: 12px; }
+  /* ---- Hero: the master viewfinder ---- */
+  .hero { padding: 110px 0 60px; }
+  .hero .vf { height: 74svh; overflow: hidden; clip-path: inset(0 0 100% 0); }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35), transparent 35%, transparent 65%, rgba(0,0,0,.6)); pointer-events: none; }
+  .hero .title { position: absolute; top: 8%; right: 6%; z-index: 5; text-align: right;
+    font-size: clamp(48px, 7vw, 120px); font-weight: 900; line-height: .92; letter-spacing: -.02em;
+    text-transform: uppercase; }
+  .hero .ruler { position: absolute; z-index: 5; left: 0; right: 0; bottom: 5%; display: flex;
+    justify-content: center; align-items: flex-end; gap: 0; }
+  .hero .ruler .tick { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 90px; color: #cfcfcf; }
+  .hero .ruler .tick i { display: block; width: 1px; height: 26px; background: rgba(255,255,255,.5); }
+  .hero .ruler .tick.on { color: #fff; }
+  .hero .ruler .tick.on i { background: #fff; height: 40px; }
+  .hero .globe { position: absolute; z-index: 5; left: 4%; bottom: 5%; width: 54px; height: 54px;
+    border: 1.5px solid #fff; border-radius: 50%; display: grid; place-items: center; }
+  .hero .globe::before { content: ""; width: 26px; height: 26px; border: 1.5px solid #fff; border-radius: 50%;
+    background: repeating-linear-gradient(90deg, transparent 0 7px, #fff 7px 8.5px); }
 
-  .pricing { padding: 40px var(--edge) 120px; }
-  .pricing .kicker { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
-  .pricing h2 { font-size: clamp(56px, 8.5vw, 150px); margin: 20px 0 64px; max-width: 14ch; }
-  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-  .tier { background: var(--black); padding: 48px 40px; display: flex; flex-direction: column; }
-  .tier h3 { font-family: 'Space Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 24px; font-weight: 400; }
-  .tier .btn { margin-top: auto; }
-  .tier .fine { margin-top: 16px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
-  @media (max-width: 860px) {
-    .copy { grid-template-columns: 1fr; }
-    .clips { grid-template-columns: 1fr; }
-    .tiers { grid-template-columns: 1fr; }
-    .hero .sub { position: static; margin-top: 24px; }
+  /* ---- Filmstrip + editorial (Clipzo lower block) ---- */
+  .strip { display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; padding: 54px 0 30px; align-items: start; }
+  .thumbs { display: flex; gap: 18px; }
+  .thumb { position: relative; width: 150px; cursor: pointer; border: 1px solid rgba(255,255,255,.18); }
+  .thumb img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; opacity: .55; }
+  .thumb.on img { opacity: 1; }
+  .thumb .corner { width: 14px; height: 14px; }
+  .thumb:not(.on) .corner { display: none; }
+  .thumb .cap { margin-top: 10px; color: #8a8a8a; }
+  .thumb.on .cap { color: #fff; }
+  .edito { font-size: clamp(26px, 3.2vw, 52px); font-weight: 500; line-height: 1.18; letter-spacing: -.01em; }
+  .edito b { font-weight: 800; }
+
+  /* ---- Screens ---- */
+  .screen { padding: 12svh 0; }
+  .screen .vf { height: 68svh; overflow: hidden; clip-path: inset(12% 8% 12% 8%); }
+  .screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .screen .tag { position: absolute; z-index: 5; top: 7%; left: 5%; color: #fff; }
+  .screen .body { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding-top: 44px; align-items: start; }
+  .screen h2 { font-size: clamp(34px, 4.6vw, 76px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .98; }
+  .screen .copy p { color: #bdbdbd; font-size: 17px; line-height: 1.7; margin-bottom: 16px; }
+  .screen .copy ul { list-style: none; margin-top: 20px; display: grid; gap: 12px; }
+  .screen .copy li { display: flex; gap: 14px; color: #d8d8d8; font-size: 15.5px; line-height: 1.55; }
+  .screen .copy li::before { content: "→"; color: #fff; flex: none; }
+
+  /* ---- CTA (corner-bracket button, Clipzo) ---- */
+  .cta-row { display: flex; justify-content: center; padding: 40px 0 20px; }
+  .btn-bracket { position: relative; display: inline-flex; align-items: center; gap: 0;
+    color: #fff; text-decoration: none; font-family: 'Space Mono', monospace; font-size: 13px;
+    letter-spacing: .12em; text-transform: uppercase; padding: 22px 58px 22px 34px; }
+  .btn-bracket .corner { position: absolute; width: 16px; height: 16px; border: 0 solid #fff; }
+  .btn-bracket .corner.tl { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
+  .btn-bracket .corner.tr { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
+  .btn-bracket .corner.bl { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+  .btn-bracket .corner.br { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+  .btn-bracket .arr { position: absolute; right: 22px; }
+
+  .finale { text-align: center; padding: 10svh 0 12svh; }
+  .finale .micro { color: #8a8a8a; margin-top: 34px; }
+  .foot { display: flex; justify-content: space-between; padding: 26px var(--edge) 34px;
+    color: #6f6f6f; border-top: 1px solid #161616; max-width: 1560px; margin: 0 auto; }
+
+  @media (max-width: 900px) {
+    .strip { grid-template-columns: 1fr; }
+    .screen .body { grid-template-columns: 1fr; }
+    .hero .title { font-size: 15vw; }
   }
 </style>
 </head>
 <body>
-<div class="grain" aria-hidden="true"></div>
-<header class="hud">
-  <span>Intake: Open</span>
-  <a class="brand" href="/">The Unfold</a>
-  <a class="cta-link" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">Start my audit</a>
-</header>
 
-<main>
+<div class="col">
   <section class="hero">
-    <p class="kicker">Golf Fitness Audit</p>
-    <h1 class="display">Your swing<br>has a body<br>problem.</h1>
-    <p class="sub">You have taken the lessons and done the gym work. Film three short clips on your phone and get a personal audit that names the one restriction stealing your distance, with the exact drills to fix it. Back within 48 hours.</p>
-    <span class="cue">Unfold the screen</span>
-    <span class="status">Intake: Open</span>
-  </section>
-
-  <section class="scene" id="scene1">
-    <div class="unfold" data-unfold>
-      <video muted loop playsinline preload="metadata" src="/videos/audit-rotation.mp4"></video>
+    <div class="vf" id="heroVf">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <canvas id="heroFilm"></canvas>
       <div class="shade"></div>
-      <span class="frame-tag">Screen 01 · Rotation</span>
-    </div>
-    <div class="copy">
-      <p class="sc">Scene One</p>
-      <h2 class="display">Stretching is not screening.</h2>
-      <p class="body">Stretching what feels tight is not the same as screening what restricts. The audit finds the actual limiter behind your swing fault, then gives you drills for that limiter only. If your slice comes from your body stalling in the downswing, you will see exactly where. If it is a club path issue instead, it will tell you that too, so you stop chasing the wrong fix.</p>
-      <div class="notes"><div style="height:0"></div></div>
-    </div>
-    <div class="clips">
-      <div class="clip"><b>Clip 1</b><p>Overhead squat. Thirty seconds, phone on the ground.</p></div>
-      <div class="clip"><b>Clip 2</b><p>Seated trunk rotation. Ten seconds each side.</p></div>
-      <div class="clip"><b>Clip 3</b><p>Hip hinge, filmed from the side. Ten seconds.</p></div>
-    </div>
-  </section>
-
-  <section class="scene" id="scene2">
-    <div class="unfold" data-unfold>
-      <video muted loop playsinline preload="metadata" src="/videos/audit-stretch.mp4"></video>
-      <div class="shade"></div>
-      <span class="frame-tag">Screen 02 · Hinge</span>
-    </div>
-    <div class="copy">
-      <p class="sc">Scene Two</p>
-      <h2 class="display">One screen. One answer.</h2>
-      <p class="body">Three movements, filmed on your phone in ten minutes. No gym. Your restriction drawn on your own clips, so you see exactly what your body is doing to your swing. Named in plain English, with three correctives in priority order and a two-week plan. Do them, re-film, watch it change.</p>
-      <div class="notes">
-        <div class="n"><b>Private</b>Clips are watched by one person, not fed to an app.</div>
-        <div class="n"><b>Honest</b>A movement screen, not a diagnosis. If something hurts, see a physiotherapist first.</div>
+      <div class="title">Golf<br>Fitness<br>Audit</div>
+      <div class="globe"></div>
+      <div class="ruler mono" id="ruler">
+        <span class="tick" data-i="0">Screen 01<i></i></span>
+        <span class="tick" data-i="1">Dissolve<i></i></span>
+        <span class="tick" data-i="2">Screen 02<i></i></span>
       </div>
     </div>
+
+    <div class="strip">
+      <div class="thumbs">
+        <div class="thumb on" data-goto="s1">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <img src="/films/audit/f_001.jpg" alt="Rotation screen">
+          <div class="cap mono">01 — Rotation</div>
+        </div>
+        <div class="thumb" data-goto="s2">
+          <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+          <img src="/films/audit/f_057.jpg" alt="Stretch screen">
+          <div class="cap mono">02 — Hinge</div>
+        </div>
+      </div>
+      <p class="edito">We <b>screen the movement</b> behind the swing fault — then give you drills for <b>that limiter only.</b> One continuous film, two screens, zero guesswork.</p>
+    </div>
   </section>
 
-  <section class="interlude">
-    <p class="big display">Generic routines<br>are generic.<br>This names yours.</p>
-    <p class="g"><b>The 48-hour guarantee</b>Your audit lands within 48 hours of your upload, or you get a full refund, no questions asked. Intake stays open only while every audit can be reviewed inside two days. One person does the reading. The first ten audits are reviewed personally.</p>
-  </section>
-
-  <section class="pricing">
-    <p class="kicker">Pick your audit</p>
-    <h2 class="display">One clear answer. Zero pressure.</h2>
-    <div class="tiers">
-      <div class="tier">
-        <h3>Single audit</h3>
-        <p class="price">$49</p>
-        <ul class="includes">
-          <li>One full movement audit</li>
-          <li>Biggest restriction, named plainly</li>
-          <li>3 correctives in order, plus 2-week plan</li>
-          <li>48-hour turnaround or money back</li>
+  <section class="screen" id="s1">
+    <div class="vf" data-vf>
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <canvas data-film="a"></canvas>
+      <div class="tag mono">Screen 01 — Thoracic rotation</div>
+    </div>
+    <div class="body">
+      <h2>Stretching is not screening.</h2>
+      <div class="copy">
+        <p>Stretching what feels tight is not the same as screening what restricts. The audit finds the actual limiter behind your swing fault, then gives you drills for that limiter only.</p>
+        <p>If your slice comes from your body stalling in the downswing, you will see exactly where. If it is a club path issue instead, it will tell you that too — so you stop chasing the wrong fix.</p>
+        <ul>
+          <li>Seated rotation test — left vs right, measured in degrees</li>
+          <li>Overhead squat — where the chain actually breaks</li>
+          <li>Single-leg balance — the quiet killer of consistency</li>
         </ul>
-        <a class="btn" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">Start my audit</a>
-      </div>
-      <div class="tier">
-        <h3>Two-pack</h3>
-        <p class="price">$89</p>
-        <ul class="includes">
-          <li>You plus a playing partner</li>
-          <li>Two full audits, same 48-hour turnaround</li>
-          <li>Compare restrictions side by side</li>
-        </ul>
-        <a class="btn ghost" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">Get the two-pack</a>
-        <p class="fine">No upsell into training packages. Checkout takes a minute.</p>
       </div>
     </div>
   </section>
-</main>
 
-<footer class="site">
-  <span>Golf Fitness Audit · Official page</span>
-  <a href="/">All stories</a>
-</footer>
+  <section class="screen" id="s2">
+    <div class="vf" data-vf>
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <canvas data-film="b"></canvas>
+      <div class="tag mono">Screen 02 — Hip hinge</div>
+    </div>
+    <div class="body">
+      <h2>Your body is the first coach.</h2>
+      <div class="copy">
+        <p>Every swing fault has a body behind it. Early extension, loss of posture, the slide — these are not swing problems first. They are movement problems wearing a swing costume.</p>
+        <p>The audit films two screens, scores them against the patterns that actually correlate with ball-striking, and hands you the three drills that move your number — not a generic mobility program.</p>
+        <ul>
+          <li>Hip hinge screen — can you load without losing spine angle</li>
+          <li>Personal drill prescription — three moves, not thirty</li>
+          <li>Re-screen in 30 days — the number moves or the plan changes</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-<script type="module" src="/src/audit.js"></script>
+  <section class="finale">
+    <div class="cta-row">
+      <a class="btn-bracket" href="https://golf-fitness-audit-loongpancoasts-projects.vercel.app/">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        Start my audit <span class="arr">↗</span>
+      </a>
+    </div>
+    <div class="micro mono">Films, scores & drills — the full audit</div>
+  </section>
+</div>
+
+<footer class="foot mono"><span>The Unfold — a DriveOn screening</span><span>02 screens / 01 film</span></footer>
+
+<script type="module">
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Film } from '/src/film.js';
+gsap.registerPlugin(ScrollTrigger);
+
+const COUNT = 113;
+// Hero: the whole continuous film scrubbed by scroll (the master viewfinder opens first)
+const heroFilm = new Film(document.getElementById('heroFilm'), 'audit', COUNT);
+const heroVf = document.getElementById('heroVf');
+gsap.to(heroVf, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
+  scrollTrigger: { trigger: '.hero', start: 'top 85%', end: 'top 25%', scrub: true } });
+
+const ticks = [...document.querySelectorAll('#ruler .tick')];
+ScrollTrigger.create({
+  trigger: '.hero', start: 'top top', end: '+=220%',
+  pin: '.hero .vf', scrub: true,
+  onUpdate(self) {
+    const p = self.progress;
+    heroFilm.draw(p);
+    const seg = p < 0.4 ? 0 : p < 0.6 ? 1 : 2;
+    ticks.forEach((t, i) => t.classList.toggle('on', i === seg));
+  }
+});
+
+// Screens: each viewfinder unfolds, its film segment loops inside
+const segs = [[0, 56], [57, 112]];
+document.querySelectorAll('[data-vf]').forEach((vf, i) => {
+  gsap.fromTo(vf, { clipPath: 'inset(12% 8% 12% 8%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
+    scrollTrigger: { trigger: vf, start: 'top 80%', end: 'top 30%', scrub: true } });
+  const film = new Film(vf.querySelector('[data-film]'), 'audit', COUNT);
+  const [from, to] = segs[i];
+  ScrollTrigger.create({
+    trigger: vf, start: 'top 85%', end: 'bottom 15%',
+    onEnter: () => film.play(from, to, 6), onEnterBack: () => film.play(from, to, 6),
+    onLeave: () => film.stop(), onLeaveBack: () => film.stop(),
+  });
+});
+
+// Thumbnail jump links
+document.querySelectorAll('.thumb').forEach(th => {
+  th.addEventListener('click', () => {
+    document.querySelectorAll('.thumb').forEach(x => x.classList.remove('on'));
+    th.classList.add('on');
+    document.getElementById(th.dataset.goto).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+// Copy reveals
+gsap.utils.toArray('.screen .body > *').forEach(el => {
+  gsap.from(el, { y: 44, opacity: 0, duration: .9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 82%' } });
+});
+gsap.from('.edito', { y: 40, opacity: 0, duration: 1, ease: 'power3.out',
+  scrollTrigger: { trigger: '.strip', start: 'top 80%' } });
+</script>
 </body>
 </html>
