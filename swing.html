@@ -112,8 +112,18 @@
   @media (max-width: 860px) {
     .nav .links { display: none; }
     .rail { display: none; }
-    .mark-card { right: calc(var(--edge) + 20px); }
     .read .row { grid-template-columns: 1fr; }
+    /* Mobile: true 16:9 film frame; card docks beneath it */
+    .tele canvas, .tele svg.marks, .tele .shade {
+      inset: auto; top: 13svh; left: var(--edge); width: calc(100% - var(--edge) * 2);
+      height: auto; aspect-ratio: 16 / 9; }
+    .tele .hud.tl, .tele .hud.tr { top: calc(13svh + (100vw - var(--edge) * 2) * 9 / 16 + 16px); }
+    .tele .hud { font-size: 9px; }
+    .tele .hud.tl { display: none; }
+    .tele .hud.tr { left: calc(var(--edge) + 20px); right: auto; text-align: left; max-width: 90%; }
+    .mark-card { top: calc(13svh + (100vw - var(--edge) * 2) * 9 / 16 + 92px); bottom: auto;
+      left: var(--edge); right: var(--edge); max-width: none; }
+    .tele .num { font-size: 62vw; }
   }
 </style>
 </head>
