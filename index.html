@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll Stories — Three Cinematic Golf Briefings</title>
+<meta name="description" content="Three scroll-driven cinematic stories: the recruiting reel, the swing telestrator, the fitness unfold.">
+<link rel="stylesheet" href="/src/shared.css">
+<style>
+  .hub { min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-end; padding: 120px var(--edge) 48px; position: relative; overflow: hidden; }
+  .hub h1 { font-size: clamp(64px, 12vw, 200px); }
+  .hub .sub { margin-top: 24px; max-width: 56ch; color: var(--muted); font-size: 16px; line-height: 1.6; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-top: 1px solid var(--line); margin-top: 64px; }
+  .card { background: var(--black); padding: 40px 32px 48px; text-decoration: none; display: flex; flex-direction: column; gap: 16px; min-height: 320px; transition: background .25s var(--ease); }
+  .card:hover { background: #0b0b09; }
+  .card .n { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .card h2 { font-family: 'Anton', sans-serif; font-size: clamp(32px, 3.4vw, 56px); text-transform: uppercase; line-height: .95; }
+  .card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-top: auto; }
+  .card .go { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink); }
+  .card .go::after { content: ' →'; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="hud">
+  <span>Three stories</span>
+  <a class="brand" href="/">Scroll Stories</a>
+  <span class="timecode">GSAP / ScrollTrigger</span>
+</header>
+<main class="hub">
+  <p class="mono" style="font-size:11px;color:var(--muted);margin-bottom:24px;">One scroll. One story. Three ways to tell it.</p>
+  <h1 class="display">Scroll<br>Stories</h1>
+  <p class="sub">Three cinematic golf briefings, each told with a different scroll-driven film mechanic. The video never just plays. It unfolds with your scroll and tells the story as you go.</p>
+  <nav class="cards">
+    <a class="card" href="/roadmap.html">
+      <span class="n">01 / The Reel</span>
+      <h2>College Golf Recruiting Roadmap</h2>
+      <p>A pinned film reel. Your scroll runs the projector: two aerial films crossfade while three acts open and close behind letterbox bars.</p>
+      <span class="go">Play the reel</span>
+    </a>
+    <a class="card" href="/swing.html">
+      <span class="n">02 / The Telestrator</span>
+      <h2>Swing Check</h2>
+      <p>A coach's broadcast telestrator. Your scroll scrubs a slow-motion swing while markup lines draw themselves over the frame, mark by mark.</p>
+      <span class="go">Mark it up</span>
+    </a>
+    <a class="card" href="/audit.html">
+      <span class="n">03 / The Unfold</span>
+      <h2>Golf Fitness Audit</h2>
+      <p>Video panels that unfold as they enter. Each movement screen opens like a shutter while the story of your body's restriction plays inside.</p>
+      <span class="go">Open the screen</span>
+    </a>
+  </nav>
+</main>
+<footer class="site">
+  <span>Scroll Stories · Cinematic golf briefings</span>
+  <span>Built with GSAP ScrollTrigger</span>
+</footer>
+</body>
+</html>
