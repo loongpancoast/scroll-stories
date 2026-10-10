@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The College Golf Recruiting Roadmap — The Reel</title>
+<meta name="description" content="A cinematic briefing for golf parents. Scroll runs the projector: three acts, two films, one roadmap.">
+<link rel="stylesheet" href="/src/shared.css">
+<style>
+  .hero { min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--edge) 12dvh; position: relative; }
+  .hero .kicker { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(64px, 11vw, 190px); }
+  .hero .sub { position: absolute; top: 22dvh; right: var(--edge); max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+  .hero .cue { position: absolute; bottom: 32px; left: var(--edge); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .hero .cue::after { content: ''; display: block; width: 1px; height: 44px; background: var(--ink); margin-top: 12px; animation: cue 1.8s var(--ease) infinite; transform-origin: top; }
+  @keyframes cue { 0% { transform: scaleY(0); } 45% { transform: scaleY(1); } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  #reel-track { position: relative; height: 700vh; }
+  .stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: #000; }
+  .stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #vidB { opacity: 0; }
+  .stage .shade { position: absolute; inset: 0; background: linear-gradient(#000000d9 0%, transparent 30%, transparent 62%, #000000e6 100%); pointer-events: none; }
+  .bar { position: absolute; left: 0; right: 0; height: 12dvh; background: #000; z-index: 5; }
+  .bar.top { top: 0; } .bar.bottom { bottom: 0; }
+
+  .act { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--edge) 16dvh; opacity: 0; visibility: hidden; }
+  .act .act-n { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+  .act h2 { font-size: clamp(56px, 9vw, 160px); max-width: 12ch; }
+  .act .body { margin-top: 28px; max-width: 58ch; font-size: 16px; line-height: 1.65; color: var(--muted); }
+  .act .note { margin-top: 24px; max-width: 52ch; border-top: 1px solid var(--line); padding-top: 20px; font-size: 14px; line-height: 1.65; color: var(--muted); }
+  .act .note strong { color: var(--ink); font-weight: 400; }
+
+  .reel-hud { position: absolute; z-index: 7; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .reel-hud.tc { top: calc(12dvh + 20px); right: var(--edge); font-variant-numeric: tabular-nums; }
+  .reel-hud.fc { bottom: calc(12dvh + 20px); left: var(--edge); }
+  .progress-rail { position: absolute; z-index: 7; left: var(--edge); right: var(--edge); bottom: calc(12dvh - 34px); height: 1px; background: #ffffff22; }
+  .progress-rail i { display: block; height: 100%; width: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; }
+
+  .finale { padding: 140px var(--edge) 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px 8vw; }
+  .finale .kicker { grid-column: 1 / -1; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  .finale h2 { grid-column: 1 / -1; font-size: clamp(56px, 8.5vw, 150px); max-width: 16ch; }
+  .finale .buy { align-self: start; }
+  .finale .side .fine { margin-top: 20px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); line-height: 1.7; }
+  @media (max-width: 860px) { .finale { grid-template-columns: 1fr; } .hero .sub { position: static; margin-top: 24px; } }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<header class="hud">
+  <span>A briefing for golf parents</span>
+  <a class="brand" href="/">The Reel</a>
+  <a class="cta-link" href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Get the Roadmap</a>
+</header>
+
+<main>
+  <section class="hero">
+    <p class="kicker">A briefing for golf parents</p>
+    <h1 class="display">The College Golf<br>Recruiting Roadmap</h1>
+    <p class="sub">Most families learn recruiting by overpaying for it. This is the right way, written down by someone who sat on both sides of the desk.</p>
+    <span class="cue">Run the projector</span>
+  </section>
+
+  <div id="reel-track">
+    <div class="stage" id="stage">
+      <video id="vidA" muted playsinline preload="auto" src="/videos/roadmap-aerial.mp4"></video>
+      <video id="vidB" muted playsinline preload="auto" src="/videos/roadmap-fairway.mp4"></video>
+      <div class="shade"></div>
+      <div class="bar top" id="barTop"></div>
+      <div class="bar bottom" id="barBot"></div>
+
+      <div class="act" id="act1">
+        <p class="act-n">Act I</p>
+        <h2 class="display">The price of guessing.</h2>
+        <p class="body">Junior golf families spend five figures a year on the sport. Recruiting is the step where they overpay the most and understand the least. The tournaments, the profiles, the emails to coaches, the scholarship math. Every step has a right way that costs little and a wrong way that costs thousands.</p>
+        <p class="note"><strong>No sales call.</strong><br>This is a $49 guide, not a $4,000 membership. No recruiting service, no pressure tactics, no promised roster spot.</p>
+      </div>
+      <div class="act" id="act2">
+        <p class="act-n">Act II</p>
+        <h2 class="display">Both sides of the desk.</h2>
+        <p class="body">He got recruited. Then he did the recruiting. This guide is what he wishes his parents had known, and what he wishes he could have told the parents who emailed him.</p>
+        <p class="note"><strong>Straight talk.</strong><br>No one can promise your son or daughter a roster spot or a scholarship. Anyone who implies otherwise is selling you, not helping you.<br><br>What coaches look at first, what gets deleted, and when the real decisions get made.</p>
+      </div>
+      <div class="act" id="act3">
+        <p class="act-n">Act III</p>
+        <h2 class="display">The honest numbers.</h2>
+        <p class="body">Real scholarship math, real scoring benchmarks, real timelines. Every number traces to a published source, including the 2025-26 rule change. Guidelines are labeled as guidelines. Nothing is dressed up to close you.</p>
+        <p class="note"><strong>Eight chapters.</strong><br>The timeline. The benchmarks. The profile. The emails that got replies, with templates. The tournaments. The money talk. The red flags. Both sides of the desk. Read it in an evening.</p>
+      </div>
+
+      <span class="reel-hud tc" id="timecode">00:00:00:00</span>
+      <span class="reel-hud fc">One time · $49</span>
+      <div class="progress-rail"><i id="railFill"></i></div>
+    </div>
+  </div>
+
+  <section class="finale">
+    <p class="kicker">Ready when you are</p>
+    <h2 class="display">Know the process before you pay for it.</h2>
+    <div class="buy">
+      <p class="price">$49</p>
+      <p class="per">One time</p>
+    </div>
+    <div class="side">
+      <ul class="includes">
+        <li>The full 8-chapter playbook, instant download</li>
+        <li>Three coach email templates you can send this week</li>
+        <li>The year-by-year recruiting timeline</li>
+        <li>The scholarship math cheat sheet, with sources</li>
+      </ul>
+      <a class="btn" href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Get the Roadmap</a>
+      <p class="fine">Secure checkout. Download link on the next page.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <span>College Golf Recruiting Roadmap · Official page</span>
+  <a href="/">All stories</a>
+</footer>
+
+<script type="module" src="/src/roadmap.js"></script>
+</body>
+</html>
