@@ -4,152 +4,266 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Swing Check — The Telestrator</title>
-<meta name="description" content="A human reads your swing. Scroll scrubs the slow-motion film while the coach's markup draws itself on, mark by mark.">
+<meta name="description" content="A frame-by-frame broadcast breakdown. Scroll scrubs one continuous slow-motion film while the telestrator draws each mark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/shared.css">
 <style>
-  .hero { min-height: 100dvh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 var(--edge) 12dvh; position: relative; }
-  .hero .kicker { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 28px; }
-  .hero h1 { font-size: clamp(64px, 11vw, 190px); }
-  .hero .sub { position: absolute; top: 22dvh; right: var(--edge); max-width: 380px; color: var(--muted); font-size: 14px; line-height: 1.65; }
-  .hero .meta { position: absolute; bottom: 32px; right: var(--edge); text-align: right; font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); line-height: 1.8; }
-  .cue { position: absolute; bottom: 32px; left: var(--edge); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+  :root { --edge: clamp(20px, 4vw, 64px); --red: #E10600; --yel: #FFD200; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #0a0505; }
+  body { background: radial-gradient(120% 90% at 50% 0%, #1c0a08 0%, #0a0505 55%, #000 100%);
+    color: #f5f2ee; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
+  .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 
-  #tele-track { position: relative; height: 650vh; }
-  .stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: #000; }
-  .stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.4) contrast(1.05); }
-  .stage .shade { position: absolute; inset: 0; background: linear-gradient(#000000c9 0%, transparent 28%, transparent 60%, #000000d9 100%); pointer-events: none; }
-  svg.marks { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; }
-  svg.marks .draw { fill: none; stroke: #ffd23f; stroke-width: 3; stroke-linecap: round; }
-  svg.marks text { fill: #ffd23f; font-family: 'Space Mono', monospace; font-size: 15px; letter-spacing: .12em; }
-  svg.marks .tag-bg { fill: #000000aa; }
+  /* ---- Nav (F1 top bar) ---- */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px var(--edge); mix-blend-mode: difference; }
+  .mark { font-weight: 900; letter-spacing: .18em; font-size: 15px; }
+  .mark b { color: var(--red); -webkit-text-stroke: 0; }
+  .nav .links { display: flex; gap: 34px; }
+  .nav .links a { color: #fff; text-decoration: none; opacity: .75; }
+  .nav .links a.on { opacity: 1; border-bottom: 2px solid var(--red); padding-bottom: 4px; }
+  .nav .cta { display: flex; gap: 14px; align-items: center; }
+  .pill { color: #fff; border: 1px solid #fff; border-radius: 999px; padding: 10px 22px;
+    text-decoration: none; font-size: 12px; }
+  .pill:hover { background: #fff; color: #000; }
+  .burger { display: flex; flex-direction: column; gap: 5px; }
+  .burger i { display: block; width: 22px; height: 2px; background: #fff; }
 
-  .mark-card { position: absolute; z-index: 5; left: var(--edge); right: var(--edge); bottom: 8dvh; display: grid; grid-template-columns: 1fr 1fr; gap: 24px 8vw; opacity: 0; visibility: hidden; }
-  .mark-card .mk { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #ffd23f; grid-column: 1 / -1; }
-  .mark-card h2 { font-size: clamp(44px, 6.5vw, 110px); grid-column: 1 / -1; max-width: 14ch; }
-  .mark-card .body { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: 56ch; }
-  .mark-card .aside { border-top: 1px solid var(--line); padding-top: 18px; font-size: 13px; line-height: 1.65; color: var(--muted); max-width: 48ch; align-self: start; }
-  .mark-card .aside strong { color: var(--ink); font-weight: 400; }
-  .mark-card ol.steps { grid-column: 1 / -1; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .mark-card ol.steps li { border-top: 1px solid var(--line); padding-top: 16px; font-size: 14px; line-height: 1.6; color: var(--muted); }
-  .mark-card ol.steps li b { display: block; color: var(--ink); font-weight: 400; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  /* ---- Hero ---- */
+  .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 var(--edge) 10svh; position: relative; }
+  .hero .loc { display: flex; align-items: center; gap: 10px; color: #cfc9c2; margin-bottom: 16px; }
+  .hero .loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity: .25; } }
+  .hero h1 { font-size: clamp(52px, 8.4vw, 138px); font-weight: 800; line-height: .92;
+    letter-spacing: -.02em; text-transform: uppercase; }
+  .hero h1 span { color: transparent; -webkit-text-stroke: 1.5px #f5f2ee; }
+  .hero p { margin-top: 20px; max-width: 44ch; color: #c9c2b9; font-size: 17px; line-height: 1.65; }
 
-  .tele-hud { position: absolute; z-index: 6; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .tele-hud.tl { top: 76px; left: var(--edge); }
-  .tele-hud.tr { top: 76px; right: var(--edge); font-variant-numeric: tabular-nums; }
+  /* ---- Telestrator (pinned) ---- */
+  .tele-wrap { height: 650vh; position: relative; }
+  .tele { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .tele .num { position: absolute; z-index: 1; left: 50%; top: 50%; transform: translate(-50%, -54%);
+    font-size: clamp(280px, 44vw, 640px); font-weight: 900; line-height: 1; color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,.14); pointer-events: none; user-select: none; }
+  .tele canvas { position: absolute; z-index: 2; inset: 6svh var(--edge); width: calc(100% - var(--edge)*2);
+    height: 88svh; display: block; border: 1px solid rgba(255,255,255,.14); }
+  .tele svg.marks { position: absolute; z-index: 3; inset: 6svh var(--edge); width: calc(100% - var(--edge)*2);
+    height: 88svh; pointer-events: none; }
+  .tele .shade { position: absolute; z-index: 2; inset: 6svh var(--edge); pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,.5), transparent 30%, transparent 70%, rgba(0,0,0,.55)); }
 
-  .finale { position: relative; min-height: 100dvh; display: flex; align-items: flex-end; overflow: hidden; }
-  .finale video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .35; filter: grayscale(.6); }
-  .finale .inner { position: relative; z-index: 2; width: 100%; padding: 120px var(--edge) 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px 8vw; background: linear-gradient(transparent, #000000e6 40%); }
-  .finale h2 { grid-column: 1 / -1; font-size: clamp(56px, 8.5vw, 150px); }
+  .tele .hud { position: absolute; z-index: 4; }
+  .tele .hud.tl { top: calc(6svh + 20px); left: calc(var(--edge) + 20px); line-height: 2; color: #e8e2da; }
+  .tele .hud.tr { top: calc(6svh + 20px); right: calc(var(--edge) + 20px); text-align: right;
+    line-height: 2; color: #e8e2da; }
+  .tele .hud.tr b { color: var(--yel); font-size: 15px; }
+
+  /* stat column (F1 right rail) */
+  .rail { position: absolute; z-index: 4; right: calc(var(--edge) + 20px); bottom: calc(6svh + 24px);
+    width: 210px; color: #e8e2da; }
+  .rail .path { width: 100%; height: 120px; margin-bottom: 14px; opacity: .9; }
+  .rail .lab { color: #8f887e; margin-bottom: 8px; }
+  .stats { display: flex; gap: 22px; margin-top: 6px; }
+  .stats div b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .stats div span { color: #8f887e; }
+  .stats .hl b { color: var(--yel); }
+
+  .mark-card { position: absolute; z-index: 4; left: calc(var(--edge) + 20px); bottom: calc(6svh + 24px);
+    max-width: 380px; background: rgba(10,5,5,.72); border: 1px solid rgba(255,255,255,.14);
+    border-left: 3px solid var(--red); padding: 18px 20px; backdrop-filter: blur(6px); }
+  .mark-card .n { color: var(--red); margin-bottom: 8px; display: block; font-weight: 700; }
+  .mark-card h3 { font-size: 21px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: -.01em; }
+  .mark-card p { color: #c9c2b9; font-size: 14.5px; line-height: 1.6; }
+
+  .strip { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px var(--edge); border-top: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.55); backdrop-filter: blur(8px); }
+
+  /* ---- Read section ---- */
+  .read { padding: 16svh var(--edge); max-width: 1200px; }
+  .read .n { color: #8f887e; margin-bottom: 14px; display: block; }
+  .read h2 { font-size: clamp(34px, 5.4vw, 84px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .96; margin-bottom: 18px; }
+  .read h2 span { color: var(--red); }
+  .read p { color: #c9c2b9; font-size: 17px; line-height: 1.7; max-width: 56ch; margin-bottom: 14px; }
+  .read .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 44px; }
+  .cell { border: 1px solid rgba(255,255,255,.12); padding: 24px; }
+  .cell b { display: block; font-size: 34px; font-weight: 800; margin-bottom: 8px; }
+  .cell:nth-child(2) b { color: var(--yel); }
+  .cell p { font-size: 14.5px; margin: 0; }
+
+  .finale { padding: 14svh var(--edge) 12svh; border-top: 1px solid rgba(255,255,255,.1);
+    display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-end; justify-content: space-between; }
+  .finale h2 { font-size: clamp(38px, 6vw, 96px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .95; }
+  .finale h2 span { color: transparent; -webkit-text-stroke: 1.5px #f5f2ee; }
+  .btn { display: inline-flex; align-items: center; gap: 12px; background: var(--red); color: #fff;
+    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    padding: 20px 36px; text-decoration: none; font-weight: 700; border-radius: 999px; }
+  .btn:hover { background: #ff1a0a; }
+  .foot { display: flex; justify-content: space-between; padding: 24px var(--edge) 32px;
+    color: #6f675f; border-top: 1px solid rgba(255,255,255,.08); }
+
   @media (max-width: 860px) {
-    .mark-card { grid-template-columns: 1fr; bottom: 5dvh; }
-    .mark-card ol.steps { grid-template-columns: 1fr; }
-    .hero .sub { position: static; margin-top: 24px; }
-    .finale .inner { grid-template-columns: 1fr; }
+    .nav .links { display: none; }
+    .rail { display: none; }
+    .mark-card { right: calc(var(--edge) + 20px); }
+    .read .row { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
-<div class="grain" aria-hidden="true"></div>
-<header class="hud">
-  <span>Two clips. One clear answer.</span>
-  <a class="brand" href="/">The Telestrator</a>
-  <a class="cta-link" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
-</header>
 
-<main>
-  <section class="hero">
-    <p class="kicker">Swing Check</p>
-    <h1 class="display">A human reads<br>your swing.</h1>
-    <p class="sub">Film it on your phone. Upload two clips. A private annotated video lands in your inbox within 24 hours. Your footage is never posted, never shared.</p>
-    <span class="cue">Scrub the film</span>
-    <div class="meta">$29 · One time<br>24-hour turnaround or your money back.</div>
-  </section>
+<nav class="nav">
+  <div class="mark">SC<b>•</b>29</div>
+  <div class="links mono">
+    <a href="#teleWrap" class="on">The Film</a><a href="#read">The Marks</a><a href="#read">The Read</a>
+  </div>
+  <div class="cta">
+    <a class="pill mono" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
+    <div class="burger"><i></i><i></i><i></i></div>
+  </div>
+</nav>
 
-  <div id="tele-track">
-    <div class="stage" id="stage">
-      <video id="swingVid" muted playsinline preload="auto" src="/videos/swing-slowmo.mp4"></video>
-      <div class="shade"></div>
-      <svg class="marks" id="marks" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <g id="g1" opacity="0">
-          <rect class="tag-bg" x="1010" y="120" width="230" height="34" />
-          <text x="1024" y="143">BACKSWING PLANE</text>
-          <line class="draw" x1="300" y1="700" x2="1140" y2="180" pathLength="1" />
-          <circle class="draw" cx="1060" cy="240" r="46" pathLength="1" />
-        </g>
-        <g id="g2" opacity="0">
-          <rect class="tag-bg" x="120" y="640" width="200" height="34" />
-          <text x="134" y="663">SPINE ANGLE</text>
-          <line class="draw" x1="620" y1="820" x2="700" y2="330" pathLength="1" />
-          <line class="draw" x1="700" y1="330" x2="640" y2="180" pathLength="1" />
-        </g>
-        <g id="g3" opacity="0">
-          <rect class="tag-bg" x="1050" y="560" width="180" height="34" />
-          <text x="1064" y="583">CLUB PATH</text>
-          <path class="draw" d="M 420 780 Q 760 640 1080 520 T 1330 380" pathLength="1" />
-        </g>
-        <g id="g4" opacity="0">
-          <rect class="tag-bg" x="620" y="120" width="140" height="34" />
-          <text x="634" y="143">IMPACT</text>
-          <circle class="draw" cx="720" cy="620" r="90" pathLength="1" />
-          <line class="draw" x1="630" y1="620" x2="810" y2="620" pathLength="1" />
-        </g>
+<section class="hero">
+  <div class="loc mono"><span class="dot"></span>Slow-mo bay — 24 fps scrub</div>
+  <h1>The<br>Telestrator<span>.</span></h1>
+  <p>One continuous slow-motion film, start to impact. Your scroll is the jog wheel: drag the swing forward and back while the telestrator draws exactly what a coach would circle — the fault, the cause, the fix.</p>
+</section>
+
+<div class="tele-wrap" id="teleWrap">
+  <div class="tele" id="tele">
+    <div class="num">01</div>
+    <canvas id="film"></canvas>
+    <div class="shade"></div>
+    <svg class="marks" id="marks" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <g id="g1" opacity="0">
+        <path class="d" d="M62,18 L74,44 L58,66" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
+        <circle class="d" cx="74" cy="44" r="4.5" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
+      </g>
+      <g id="g2" opacity="0">
+        <path class="d" d="M30,72 L46,60 L62,64" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
+        <circle class="d" cx="46" cy="60" r="3.6" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
+      </g>
+      <g id="g3" opacity="0">
+        <path class="d" d="M22,30 L40,26 L58,30" fill="none" stroke="#FFD200" stroke-width="1.1" pathLength="1"/>
+        <path class="d" d="M22,34 L58,34" fill="none" stroke="#FFD200" stroke-width="1.1" pathLength="1" stroke-dasharray="2 1.6"/>
+      </g>
+      <g id="g4" opacity="0">
+        <circle class="d" cx="70" cy="70" r="9" fill="none" stroke="#E10600" stroke-width="1.3" pathLength="1"/>
+        <path class="d" d="M70,61 L70,50 M70,79 L70,88 M61,70 L52,70 M79,70 L88,70" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
+      </g>
+    </svg>
+    <div class="hud tl mono">Telestrator — scroll scrub<br>One film: slow-mo → impact</div>
+    <div class="hud tr mono">Frame <b id="frame">000</b> / 113<br>24 fps — jog enabled</div>
+    <div class="rail">
+      <svg class="path" viewBox="0 0 210 120" fill="none">
+        <path id="swingPath" d="M20,105 C60,100 70,70 95,68 C120,66 130,40 175,32" stroke="#E10600" stroke-width="2.5" pathLength="1"/>
+        <circle cx="20" cy="105" r="4" fill="#E10600"/><circle cx="175" cy="32" r="4" fill="#FFD200"/>
       </svg>
-
-      <div class="mark-card" id="mk1">
-        <p class="mk">Mark 01</p>
-        <h2 class="display">Two clips. That is all it takes.</h2>
-        <p class="body">One from behind, down the line. One facing you, face on. Your phone is fine. Slow motion mode helps but is not required. The whole thing takes less time than a bucket of range balls.</p>
-        <p class="aside"><strong>Film in bright light.</strong><br>Keep the full swing in frame. Landscape mode. Uploads open right after checkout.</p>
+      <div class="lab mono">Swing path — traced live</div>
+      <div class="stats mono">
+        <div><b id="stFrame">000</b><span>Frame</span></div>
+        <div><b>04</b><span>Marks</span></div>
+        <div class="hl"><b>24</b><span>FPS</span></div>
       </div>
-      <div class="mark-card" id="mk2">
-        <p class="mk">Mark 02</p>
-        <h2 class="display">One fault. Named plainly.</h2>
-        <p class="body">Not five faults. One. The single biggest thing in your swing, named in plain English, with exactly three fixes in priority order so you know what to work on first. Plus one drill that attacks the first fault directly.</p>
-        <p class="aside"><strong>Private annotated video.</strong><br>Slow motion replay of your swing with drawn lines, the way a coach would mark it up. Delivered as a private link.<br><br><strong>No upsell.</strong> No $150 lesson. Just the answer.</p>
-      </div>
-      <div class="mark-card" id="mk3">
-        <p class="mk">Mark 03</p>
-        <h2 class="display">Three steps. One day.</h2>
-        <ol class="steps">
-          <li><b>Step 1 — Pay $29</b>Secure checkout, takes under a minute. 24-hour turnaround or your money back.</li>
-          <li><b>Step 2 — Upload two clips</b>Down the line and face on. Fields activate the moment checkout completes.</li>
-          <li><b>Step 3 — Get the read</b>A private video link lands in your inbox within 24 hours. Never posted, never shared.</li>
-        </ol>
-      </div>
-      <div class="mark-card" id="mk4">
-        <p class="mk">Mark 04</p>
-        <h2 class="display">The honest part.</h2>
-        <p class="body">The read comes from someone who played competitive golf from age 4 to 19 and studied kinesiology. Not a certified instructor. One fault at a time is the whole point. This will not fix your swing in a day, and it does not pretend to.</p>
-        <p class="aside"><strong>Intake pauses before it slips.</strong><br>If order volume exceeds what can be reviewed in a day, intake pauses instead of delivering late.</p>
-      </div>
-
-      <span class="tele-hud tl">Slow-mo · Scrub to analyze</span>
-      <span class="tele-hud tr" id="framecount">FRAME 0000</span>
+    </div>
+    <div class="mark-card" id="markCard">
+      <span class="n mono" id="mkN">Mark 01 / 04</span>
+      <h3 id="mkH">The position at the top</h3>
+      <p id="mkP">This is where most swings are won or lost, and it happens too fast to see at full speed. Scrub it back and forth — the club's position here decides everything after.</p>
+    </div>
+    <div class="strip mono">
+      <span>Slow-mo analysis — frame by frame</span><span>04 marks / 01 film <span style="color:var(--red)">→</span></span>
     </div>
   </div>
+</div>
 
-  <section class="finale">
-    <video muted loop playsinline autoplay src="/videos/swing-impact.mp4"></video>
-    <div class="inner">
-      <h2 class="display">One critique.<br>One clear answer.</h2>
-      <div>
-        <p class="price">$29</p>
-        <p class="per">One time</p>
-      </div>
-      <div>
-        <a class="btn" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
-        <p class="per" style="margin-top:16px;">24-hour turnaround or your money back.</p>
-      </div>
-    </div>
-  </section>
-</main>
+<section class="read" id="read">
+  <span class="n mono">The read — after the film</span>
+  <h2>Stop guessing.<br><span>Start seeing.</span></h2>
+  <p>You have watched your swing on video before. It did not help, because full speed hides the two frames that matter. The Swing Check isolates those frames, circles the actual fault, and tells you which one to fix first — because fixing the wrong thing is how a slice becomes a shank.</p>
+  <p>Send two clips. Get the telestrator treatment: every mark drawn on your swing, every fix in order, none of the guesswork.</p>
+  <div class="row">
+    <div class="cell"><b>02</b><p class="mono">Clips — down the line + face on. Phone video is enough.</p></div>
+    <div class="cell"><b>04</b><p class="mono">Marks drawn on your actual frames, in fix order.</p></div>
+    <div class="cell"><b>24<span style="font-size:20px">hr</span></b><p class="mono">Turnaround. The breakdown lands the next day.</p></div>
+  </div>
+</section>
 
-<footer class="site">
-  <span>Swing Check · Official page</span>
-  <a href="/">All stories</a>
-</footer>
+<section class="finale">
+  <h2>Send the clips.<br><span>Get the truth.</span></h2>
+  <div><a class="btn" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check ↗</a></div>
+</section>
 
-<script type="module" src="/src/swing.js"></script>
+<footer class="foot mono"><span>The Telestrator — a DriveOn breakdown</span><span>Film 01 / 04 marks</span></footer>
+
+<script type="module">
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Film } from '/src/film.js';
+gsap.registerPlugin(ScrollTrigger);
+
+const COUNT = 113;
+const film = new Film(document.getElementById('film'), 'swing', COUNT);
+const frameEl = document.getElementById('frame');
+const stFrame = document.getElementById('stFrame');
+
+const groups = ['g1','g2','g3','g4'].map(id => document.getElementById(id));
+groups.forEach(g => g.querySelectorAll('.d').forEach(el => {
+  el.style.strokeDasharray = 1; el.style.strokeDashoffset = 1;
+}));
+const marks = [
+  { n: 'Mark 01 / 04', h: 'The position at the top', p: "This is where most swings are won or lost, and it happens too fast to see at full speed. Scrub it back and forth — the club's position here decides everything after." },
+  { n: 'Mark 02 / 04', h: 'The first move down', p: "The downswing's first six inches write the rest of the story. If the club drops under the plane here, the body spends the whole downswing compensating." },
+  { n: 'Mark 03 / 04', h: 'The strike zone', p: "Yellow lines, because this is the money zone. Path and face at impact, frozen — the only two numbers that decide where the ball actually goes." },
+  { n: 'Mark 04 / 04', h: 'The finish tells', p: "A balanced finish is a receipt for everything before it. If the swing ends here, the sequence worked. If not, scroll back — the answer is in marks one through three." },
+];
+const card = document.getElementById('markCard');
+let curMark = -1;
+function showMark(i) {
+  if (i === curMark) return; curMark = i;
+  const m = marks[i];
+  gsap.to(card, { opacity: 0, y: 10, duration: .22, ease: 'power2.in', onComplete() {
+    document.getElementById('mkN').textContent = m.n;
+    document.getElementById('mkH').textContent = m.h;
+    document.getElementById('mkP').textContent = m.p;
+    gsap.to(card, { opacity: 1, y: 0, duration: .35, ease: 'power2.out' });
+  }});
+}
+// Draw timeline: each mark group draws then fades as the next arrives
+const tl = gsap.timeline({ paused: true });
+groups.forEach((g, i) => {
+  const t = 0.06 + i * 0.24;
+  tl.to(g, { opacity: 1, duration: 0.02 }, t);
+  tl.to(g.querySelectorAll('.d'), { strokeDashoffset: 0, duration: 0.09, ease: 'power1.inOut', stagger: 0.02 }, t);
+  if (i < groups.length - 1) tl.to(g, { opacity: 0, duration: 0.05 }, t + 0.17);
+});
+tl.to('#swingPath', { strokeDashoffset: 0, duration: 1, ease: 'none' }, 0);
+document.getElementById('swingPath').style.strokeDasharray = 1;
+document.getElementById('swingPath').style.strokeDashoffset = 1;
+
+ScrollTrigger.create({
+  trigger: '#teleWrap', start: 'top top', end: 'bottom bottom', scrub: true,
+  onUpdate(self) {
+    const p = self.progress;
+    film.draw(p);
+    tl.progress(p);
+    const f = Math.min(COUNT - 1, Math.floor(p * COUNT));
+    const s = String(f).padStart(3, '0');
+    frameEl.textContent = s; stFrame.textContent = s;
+    showMark(Math.min(3, Math.floor(p * 4)));
+  }
+});
+gsap.utils.toArray('.read > *').forEach(el => {
+  gsap.from(el, { y: 40, opacity: 0, duration: .9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 82%' } });
+});
+</script>
 </body>
 </html>
