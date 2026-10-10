@@ -15,57 +15,43 @@
   body { background: #000; color: #f2f2f2; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
   .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 
-  /* ---- HUD (Zajno top bar) ---- */
+  /* ---- HUD: Zajno top bar, exact ---- */
   .hud { position: fixed; top: 0; left: 0; right: 0; z-index: 60;
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 26px var(--edge); mix-blend-mode: difference; pointer-events: none; }
   .hud .left { line-height: 1.9; opacity: .85; }
+  .hud .left .tc { color: #fff; opacity: 1; }
   .hud .wordmark { font-weight: 900; letter-spacing: .42em; font-size: 15px; text-indent: .42em; }
+  .hud .right { text-align: right; line-height: 1.9; opacity: .85; }
   .hud .right a { color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 2px; pointer-events: auto; }
 
-  /* ---- Hero ---- */
-  .hero { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 0 var(--edge) 9svh; position: relative; }
-  .hero .kick { color: #8a8a8a; margin-bottom: 18px; }
-  .hero h1 { font-size: clamp(44px, 7.2vw, 118px); font-weight: 800; line-height: .94;
-    letter-spacing: -.02em; text-transform: uppercase; max-width: 14ch; }
-  .hero h1 em { font-style: normal; color: #8a8a8a; }
-  .hero p { margin-top: 22px; max-width: 46ch; color: #bdbdbd; font-size: 17px; line-height: 1.65; }
-  .scroll-cue { position: absolute; right: var(--edge); bottom: 9svh; color: #8a8a8a;
-    writing-mode: vertical-rl; letter-spacing: .3em; }
-
-  /* ---- Reel (pinned) ---- */
+  /* ---- Reel: the Zajno viewport. Pin IS the first screen. ---- */
   .reel-wrap { height: 700vh; position: relative; }
   .reel { position: sticky; top: 0; height: 100svh; overflow: hidden; background: #000; }
   .reel canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .reel .grade { position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgba(0,0,0,.55), transparent 22%, transparent 62%, rgba(0,0,0,.78)); }
-  .reel .bar { position: absolute; left: 0; right: 0; height: 7svh; background: #000; z-index: 5; transform-origin: 50% 0; }
-  .reel .bar.top { top: 0; } .reel .bar.bot { bottom: 0; transform-origin: 50% 100%; }
-  .reel .meta { position: absolute; z-index: 6; color: #cfcfcf; }
-  .reel .meta.tl { top: calc(7svh + 22px); left: var(--edge); line-height: 1.9; }
-  .reel .meta.tr { top: calc(7svh + 22px); right: var(--edge); text-align: right; line-height: 1.9; }
-  .reel .meta.bl { bottom: calc(7svh + 26px); left: var(--edge); display: flex; gap: 12px; align-items: center; }
-  .reel .meta.br { bottom: calc(7svh + 26px); right: var(--edge); }
-  .orbit { width: 26px; height: 26px; border: 1px solid #6f6f6f; border-radius: 50%; position: relative; }
-  .orbit::after { content: ""; position: absolute; inset: 5px; border: 1px solid #6f6f6f; border-radius: 50%;
-    border-top-color: transparent; animation: spin 3s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .reel .progress { position: absolute; z-index: 6; left: var(--edge); right: var(--edge);
-    bottom: calc(7svh + 8px); height: 1px; background: rgba(255,255,255,.18); }
-  .reel .progress i { display: block; height: 100%; width: 100%; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+    background: linear-gradient(180deg, rgba(0,0,0,.5), transparent 24%, transparent 60%, rgba(0,0,0,.82)); }
 
-  /* giant act title bleeding off the bottom (Zajno) */
-  .act-title { position: absolute; z-index: 6; left: 0; right: 0; bottom: -0.16em;
+  /* giant act title bleeding off the bottom — Zajno */
+  .act-title { position: absolute; z-index: 5; left: 0; right: 0; bottom: -0.16em;
     text-align: center; font-weight: 900; text-transform: uppercase; white-space: nowrap;
     font-size: clamp(40px, 9.5vw, 200px); letter-spacing: -.03em; line-height: 1;
     color: #fff; opacity: .95; pointer-events: none; text-shadow: 0 2px 30px rgba(0,0,0,.45); }
-  .act-kicker { position: absolute; z-index: 6; left: var(--edge); bottom: calc(7svh + 64px);
-    color: #fff; max-width: 40ch; }
-  .act-kicker .n { color: #8a8a8a; display: block; margin-bottom: 10px; }
-  .act-kicker h2 { font-size: clamp(26px, 3.4vw, 46px); font-weight: 800; text-transform: uppercase;
-    letter-spacing: -.01em; line-height: 1.02; margin-bottom: 12px; }
-  .act-kicker p { color: #c9c9c9; font-size: 15.5px; line-height: 1.6; }
+
+  /* act story block, bottom-left above the status line */
+  .act-story { position: absolute; z-index: 6; left: var(--edge); bottom: 165px; max-width: 40ch; }
+  .act-story .n { color: #8a8a8a; display: block; margin-bottom: 10px; }
+  .act-story p { color: #c9c9c9; font-size: 15px; line-height: 1.6; }
+
+  /* corner status labels — Zajno bottom row */
+  .status { position: absolute; z-index: 6; bottom: 30px; display: flex; gap: 12px; align-items: center; color: #cfcfcf; }
+  .status.bl { left: var(--edge); }
+  .status.br { right: var(--edge); }
+  .orbit { width: 26px; height: 26px; border: 1px solid #6f6f6f; border-radius: 50%; position: relative; flex: none; }
+  .orbit::after { content: ""; position: absolute; inset: 5px; border: 1px solid #6f6f6f; border-radius: 50%;
+    border-top-color: transparent; animation: spin 3s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .cue { display: none; }
 
   /* ---- Chapters ---- */
   .chapters { padding: 16svh var(--edge); display: grid; gap: 14svh; max-width: 1200px; }
@@ -91,48 +77,34 @@
     color: #6f6f6f; border-top: 1px solid #161616; }
 
   @media (max-width: 720px) {
-    .hud .left { display: none; }
-    .act-kicker { right: var(--edge); }
-    .reel .meta.bl, .reel .meta.br { display: none; }
-    /* Mobile: the film is a true 16:9 cinema frame, never a cropped full-bleed */
-    .reel canvas, .reel .grade { inset: auto; top: 15svh; left: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; }
-    .reel .meta.tl, .reel .meta.tr { top: calc(15svh + (100vw * 9 / 16) + 18px); }
-    .act-kicker { bottom: calc(7svh + 96px); }
+    .hud .left .sub { display: none; }
+    .act-story { top: calc(14svh + 100vw * 9 / 16 + 24px); bottom: auto; left: var(--edge); right: var(--edge); }
+    .act-story p { display: none; }
+    .status.br { display: none; }
+    .reel canvas, .reel .grade { inset: auto; top: 14svh; left: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; }
   }
 </style>
 </head>
 <body>
 
 <header class="hud">
-  <div class="left mono">College golf recruiting<br>Cycle • 2025–26 — Reel 01</div>
+  <div class="left mono">College golf recruiting<br><span class="sub">Cycle • 2025–26 — Reel 01<br></span><span class="tc" id="tc">TC 00:00:00:00</span></div>
   <div class="wordmark">THE&nbsp;REEL</div>
-  <div class="right mono"><a href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a></div>
+  <div class="right mono">Reel 01 / 01<br><a href="https://recruiting-roadmap-loongpancoasts-projects.vercel.app/">Start my roadmap ↗</a></div>
 </header>
-
-<section class="hero">
-  <div class="kick mono">A cinematic briefing for golf parents — scroll runs the projector</div>
-  <h1>The recruiting road<em>map,</em> as a film.</h1>
-  <p>Three acts. One continuous film. Your scroll moves the projector head: the aerial survey, the dissolve, the walk down the fairway — while the story of how a junior golfer actually gets recruited unfolds underneath.</p>
-  <div class="scroll-cue mono">Scroll — 03 acts</div>
-</section>
 
 <div class="reel-wrap" id="reelWrap">
   <div class="reel" id="reel">
     <canvas id="film"></canvas>
     <div class="grade"></div>
-    <div class="bar top" id="barTop"></div>
-    <div class="bar bot" id="barBot"></div>
-    <div class="meta tl mono">Projector — scroll scrub<br><span id="tc">TC 00:00:00:00</span></div>
-    <div class="meta tr mono">Reel 01 / 01<br>18.8 sec — one film</div>
-    <div class="meta bl mono"><span class="orbit"></span>Screening: active</div>
-    <div class="meta br mono">All systems: active</div>
-    <div class="act-kicker" id="actKicker">
+    <div class="act-story" id="actStory">
       <span class="n mono" id="actN">Act I — 00:00</span>
-      <h2 id="actH">The Invitation</h2>
       <p id="actP">For most families, recruiting starts with a question nobody can answer: is my kid actually good enough to play in college? Here is the honest frame — what coaches look at first, and why the highlight reel is the last thing that matters.</p>
     </div>
     <div class="act-title" id="actTitle">The Invitation</div>
-    <div class="progress"><i id="prog"></i></div>
+    <div class="status bl mono"><span class="orbit"></span>Screening: active</div>
+    <div class="cue mono">Scroll</div>
+    <div class="status br mono">All systems: active</div>
   </div>
 </div>
 
@@ -173,25 +145,23 @@ gsap.registerPlugin(ScrollTrigger);
 const COUNT = 113, FPS = 6, DUR = COUNT / FPS;
 const film = new Film(document.getElementById('film'), 'roadmap', COUNT);
 const tc = document.getElementById('tc');
-const prog = document.getElementById('prog');
 const acts = [
-  { n: 'Act I — 00:00', h: 'The Invitation', t: 'The Invitation',
+  { n: 'Act I — 00:00', t: 'The Invitation',
     p: 'For most families, recruiting starts with a question nobody can answer: is my kid actually good enough to play in college? Here is the honest frame — what coaches look at first, and why the highlight reel is the last thing that matters.' },
-  { n: 'Act II — 00:09', h: 'The Standard', t: 'The Standard',
+  { n: 'Act II — 00:09', t: 'The Standard',
     p: 'The film dissolves to the fairway. This is the standard: tournament scorecards on real courses, a contact timeline matched to your graduation year, and film that shows a coach what they actually evaluate.' },
-  { n: 'Act III — 00:16', h: 'The Roadmap', t: 'The Roadmap',
+  { n: 'Act III — 00:16', t: 'The Roadmap',
     p: 'The walk continues. The roadmap itself: the schedule, the scripts, the visits, the fit filter. A process you run — instead of a process that happens to you.' },
 ];
 let cur = -1;
 function setAct(i) {
   if (i === cur) return; cur = i;
   const a = acts[i];
-  gsap.to(['#actKicker', '#actTitle'], { opacity: 0, y: 14, duration: .28, ease: 'power2.in', onComplete() {
+  gsap.to(['#actStory', '#actTitle'], { opacity: 0, y: 14, duration: .28, ease: 'power2.in', onComplete() {
     document.getElementById('actN').textContent = a.n;
-    document.getElementById('actH').textContent = a.h;
     document.getElementById('actP').textContent = a.p;
     document.getElementById('actTitle').textContent = a.t;
-    gsap.to(['#actKicker', '#actTitle'], { opacity: 1, y: 0, duration: .45, ease: 'power2.out' });
+    gsap.to(['#actStory', '#actTitle'], { opacity: 1, y: 0, duration: .45, ease: 'power2.out' });
   }});
 }
 function fmt(s) {
@@ -206,11 +176,7 @@ ScrollTrigger.create({
     const p = self.progress;
     film.draw(p);
     tc.textContent = fmt(p * DUR);
-    prog.style.transform = `scaleX(${p})`;
     setAct(p < 0.45 ? 0 : p < 0.8 ? 1 : 2);
-    const breathe = 1 - Math.sin(p * Math.PI * 3) * 0.28;
-    document.getElementById('barTop').style.transform = `scaleY(${breathe})`;
-    document.getElementById('barBot').style.transform = `scaleY(${breathe})`;
   }
 });
 gsap.utils.toArray('.chap').forEach(el => {
