@@ -4,27 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Swing Check — The Telestrator</title>
-<meta name="description" content="A frame-by-frame broadcast breakdown. Scroll scrubs one continuous slow-motion film while the telestrator draws each mark.">
+<meta name="description" content="A frame-by-frame broadcast breakdown of your swing. Send two clips, get the telestrator treatment.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/src/shared.css">
 <style>
   :root { --edge: clamp(20px, 4vw, 64px); --red: #E10600; --yel: #FFD200; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { background: #0a0505; }
   body { background: radial-gradient(120% 90% at 50% 0%, #1c0a08 0%, #0a0505 55%, #000 100%);
-    color: #f5f2ee; font-family: 'Inter Tight', system-ui, sans-serif; overflow-x: hidden; }
+    color: #f5f2ee; font-family: 'Inter Tight', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   .mono { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  img { display: block; max-width: 100%; }
 
-  /* ---- Nav: F1 top bar, exact ---- */
-  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px var(--edge); mix-blend-mode: difference; }
-  .mark { font-weight: 900; letter-spacing: .18em; font-size: 15px; }
+  /* ---------- Nav ---------- */
+  .nav { display: flex; justify-content: space-between; align-items: center; padding: 20px var(--edge); }
+  .mark { font-weight: 900; letter-spacing: .18em; font-size: 15px; color: #fff; }
   .mark b { color: var(--red); }
   .nav .links { display: flex; gap: 34px; }
   .nav .links a { color: #fff; text-decoration: none; opacity: .75; }
   .nav .links a.on { opacity: 1; border-bottom: 2px solid var(--red); padding-bottom: 4px; }
+  .nav .links a:hover { opacity: 1; }
   .nav .cta { display: flex; gap: 14px; align-items: center; }
   .pill { color: #fff; border: 1px solid #fff; border-radius: 999px; padding: 10px 22px;
     text-decoration: none; font-size: 12px; }
@@ -32,99 +33,89 @@
   .burger { display: flex; flex-direction: column; gap: 5px; }
   .burger i { display: block; width: 22px; height: 2px; background: #fff; }
 
-  /* ---- Telestrator: the F1 hero viewport. Pin IS the first screen. ---- */
-  .tele-wrap { height: 650vh; position: relative; }
-  .tele { position: sticky; top: 0; height: 100svh; overflow: hidden; }
-  .tele .num { position: absolute; z-index: 3; left: 72%; top: 30%; transform: translate(-50%, -50%);
-    font-size: clamp(280px, 44vw, 640px); font-weight: 900; line-height: 1; color: transparent;
-    -webkit-text-stroke: 2px rgba(255,255,255,.16);
-    pointer-events: none; user-select: none; }
-  .tele canvas { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; display: block; }
-  .tele svg.marks { position: absolute; z-index: 3; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .tele .shade { position: absolute; z-index: 2; inset: 0; pointer-events: none;
-    background: linear-gradient(180deg, rgba(0,0,0,.55), transparent 32%, transparent 68%, rgba(0,0,0,.6)); }
-
-  /* left hero block — F1 label/display/para, overlaid */
-  .intro { position: absolute; z-index: 4; top: 12svh; left: var(--edge); max-width: 430px; }
-  .intro .loc { display: flex; align-items: center; gap: 10px; color: #e8e2da; margin-bottom: 14px; }
-  .intro .loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1.6s infinite; }
-  @keyframes blink { 50% { opacity: .25; } }
-  .intro h1 { font-size: clamp(46px, 6.4vw, 104px); font-weight: 800; line-height: .92;
+  /* ---------- Hero: the F1 viewport ---------- */
+  .hero { position: relative; min-height: calc(100svh - 76px); overflow: hidden;
+    display: flex; align-items: center; }
+  .hero img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero .shade { position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.55), transparent 32%, transparent 62%, rgba(0,0,0,.65)); }
+  .hero .num { position: absolute; right: 9%; top: 3%; z-index: 2;
+    font-size: clamp(220px, 34vw, 520px); font-weight: 900; line-height: 1; color: transparent;
+    -webkit-text-stroke: 2px rgba(255,255,255,.16); user-select: none; }
+  .hero svg.marks { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+  .hero .inner { position: relative; z-index: 3; width: 100%; padding: 40px var(--edge) 120px;
+    display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; }
+  .intro { max-width: 480px; }
+  .intro .loc { display: flex; align-items: center; gap: 10px; color: #e8e2da; margin-bottom: 16px; }
+  .intro .loc .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+  .intro h1 { font-size: clamp(52px, 7vw, 118px); font-weight: 800; line-height: .92;
     letter-spacing: -.02em; text-transform: uppercase; text-shadow: 0 2px 24px rgba(0,0,0,.6); }
-  .intro h1 span { color: transparent; -webkit-text-stroke: 1.5px #f5f2ee; }
-  .intro p { margin-top: 16px; color: #d8d2c9; font-size: 15.5px; line-height: 1.6; max-width: 36ch;
+  .intro p { margin-top: 18px; color: #d8d2c9; font-size: 16px; line-height: 1.65; max-width: 38ch;
     text-shadow: 0 1px 12px rgba(0,0,0,.7); }
-
-  .tele .hud { position: absolute; z-index: 4; line-height: 2; color: #e8e2da; }
-  .tele .hud.tr { top: 12svh; right: var(--edge); text-align: right; }
-  .tele .hud.tr b { color: var(--yel); font-size: 15px; }
-
-  /* right stat rail — F1 */
-  .rail { position: absolute; z-index: 4; right: var(--edge); top: 50%; transform: translateY(-50%);
-    width: 210px; color: #e8e2da; }
-  .rail .path { width: 100%; height: 120px; margin-bottom: 14px; opacity: .9; }
-  .rail .lab { color: #8f887e; margin-bottom: 8px; }
-  .stats { display: flex; gap: 22px; margin-top: 6px; }
-  .stats div b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .rail { width: 230px; color: #e8e2da; justify-self: end; }
+  .rail .path { width: 100%; height: 120px; margin-bottom: 14px; }
+  .rail .lab { color: #8f887e; margin-bottom: 10px; }
+  .stats { display: flex; gap: 24px; }
+  .stats div b { display: block; font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
   .stats div span { color: #8f887e; }
   .stats .hl b { color: var(--yel); }
+  .hero .strip { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+    display: flex; justify-content: space-between; gap: 12px; padding: 18px var(--edge);
+    border-top: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.55); }
 
-  .mark-card { position: absolute; z-index: 4; left: var(--edge); bottom: 92px;
-    max-width: 380px; background: rgba(10,5,5,.72); border: 1px solid rgba(255,255,255,.14);
-    border-left: 3px solid var(--red); padding: 18px 20px; backdrop-filter: blur(6px); }
-  .mark-card .n { color: var(--red); margin-bottom: 8px; display: block; font-weight: 700; }
-  .mark-card h3 { font-size: 21px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: -.01em; }
-  .mark-card p { color: #c9c2b9; font-size: 14.5px; line-height: 1.6; }
+  /* ---------- The marks ---------- */
+  .marks-sec { padding: 14vh var(--edge); max-width: 1300px; margin: 0 auto; }
+  .marks-sec .n { color: #8f887e; display: block; margin-bottom: 16px; }
+  .marks-sec h2 { font-size: clamp(34px, 5vw, 76px); font-weight: 800; text-transform: uppercase;
+    letter-spacing: -.02em; line-height: .96; margin-bottom: 14px; }
+  .marks-sec h2 span { color: var(--red); }
+  .marks-sec > p { color: #c9c2b9; font-size: 17px; line-height: 1.7; max-width: 60ch; margin-bottom: 50px; }
+  .mark-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .mcard { border: 1px solid rgba(255,255,255,.12); border-left: 3px solid var(--red);
+    background: rgba(255,255,255,.02); }
+  .mcard .frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+  .mcard .frame img { width: 100%; height: 100%; object-fit: cover; }
+  .mcard .frame svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .mcard .body { padding: 22px 24px 26px; }
+  .mcard .body .n { color: var(--red); font-weight: 700; display: block; margin-bottom: 10px; }
+  .mcard .body h3 { font-size: 22px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
+  .mcard .body p { color: #c9c2b9; font-size: 15px; line-height: 1.65; }
 
-  .strip { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0;
-    display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    padding: 18px var(--edge); border-top: 1px solid rgba(255,255,255,.12);
-    background: rgba(0,0,0,.55); backdrop-filter: blur(8px); }
-  .cue { position: absolute; z-index: 4; left: 50%; bottom: 76px; transform: translateX(-50%);
-    color: #8f887e; letter-spacing: .3em; }
-
-  /* ---- Read section ---- */
-  .read { padding: 16svh var(--edge); max-width: 1200px; }
-  .read .n { color: #8f887e; margin-bottom: 14px; display: block; }
-  .read h2 { font-size: clamp(34px, 5.4vw, 84px); font-weight: 800; text-transform: uppercase;
+  /* ---------- The read ---------- */
+  .read { padding: 12vh var(--edge); max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,.08); }
+  .read h2 { font-size: clamp(34px, 5vw, 76px); font-weight: 800; text-transform: uppercase;
     letter-spacing: -.02em; line-height: .96; margin-bottom: 18px; }
-  .read h2 span { color: var(--red); }
-  .read p { color: #c9c2b9; font-size: 17px; line-height: 1.7; max-width: 56ch; margin-bottom: 14px; }
-  .read .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 44px; }
-  .cell { border: 1px solid rgba(255,255,255,.12); padding: 24px; }
-  .cell b { display: block; font-size: 34px; font-weight: 800; margin-bottom: 8px; }
+  .read p { color: #c9c2b9; font-size: 17px; line-height: 1.7; max-width: 58ch; margin-bottom: 14px; }
+  .read .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 46px; }
+  .cell { border: 1px solid rgba(255,255,255,.12); padding: 26px; }
+  .cell b { display: block; font-size: 36px; font-weight: 800; margin-bottom: 10px; }
   .cell:nth-child(2) b { color: var(--yel); }
   .cell p { font-size: 14.5px; margin: 0; }
 
-  .finale { padding: 14svh var(--edge) 12svh; border-top: 1px solid rgba(255,255,255,.1);
-    display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-end; justify-content: space-between; }
-  .finale h2 { font-size: clamp(38px, 6vw, 96px); font-weight: 800; text-transform: uppercase;
+  .finale { padding: 14vh var(--edge); border-top: 1px solid rgba(255,255,255,.1);
+    display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-end; justify-content: space-between;
+    max-width: 1300px; margin: 0 auto; }
+  .finale h2 { font-size: clamp(40px, 6vw, 100px); font-weight: 800; text-transform: uppercase;
     letter-spacing: -.02em; line-height: .95; }
   .finale h2 span { color: transparent; -webkit-text-stroke: 1.5px #f5f2ee; }
-  .btn { display: inline-flex; align-items: center; gap: 12px; background: var(--red); color: #fff;
-    font-family: 'Space Mono', monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
-    padding: 20px 36px; text-decoration: none; font-weight: 700; border-radius: 999px; }
+  .btn { display: inline-block; background: var(--red); color: #fff; font-family: 'Space Mono', monospace;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; padding: 20px 38px;
+    text-decoration: none; font-weight: 700; border-radius: 999px; }
   .btn:hover { background: #ff1a0a; }
-  .foot { display: flex; justify-content: space-between; padding: 24px var(--edge) 32px;
+  .foot { display: flex; justify-content: space-between; gap: 12px; padding: 24px var(--edge) 34px;
     color: #6f675f; border-top: 1px solid rgba(255,255,255,.08); }
 
-  @media (max-width: 860px) {
+  @media (max-width: 900px) {
     .nav .links { display: none; }
+    .hero { min-height: 0; display: block; }
+    .hero img.bg { position: relative; inset: auto; aspect-ratio: 16 / 10; height: auto; }
+    .hero .shade, .hero svg.marks { display: none; }
+    .hero .num { font-size: 52vw; top: 2%; right: -4%; }
+    .hero .inner { display: block; padding: 26px var(--edge) 100px; margin-top: -38%; }
     .rail { display: none; }
+    .intro h1 { font-size: 14.5vw; }
+    .mark-grid { grid-template-columns: 1fr; }
     .read .row { grid-template-columns: 1fr; }
-    .cue { display: none; }
-    /* Mobile: 16:9 film frame up top, content stacked beneath inside the pin */
-    .tele canvas, .tele svg.marks, .tele .shade {
-      inset: auto; top: 11svh; left: var(--edge); width: calc(100% - var(--edge) * 2);
-      height: auto; aspect-ratio: 16 / 9; }
-    .tele .num { font-size: 64vw; left: 50%; top: 30%; }
-    .tele .hud.tr { top: calc(11svh + (100vw - var(--edge) * 2) * 9 / 16 + 12px);
-      right: var(--edge); font-size: 9px; white-space: nowrap; }
-    .intro { top: calc(11svh + (100vw - var(--edge) * 2) * 9 / 16 + 56px); right: var(--edge); max-width: none; }
-    .intro h1 { font-size: 10.5vw; }
-    .intro p { font-size: 14px; }
-    .mark-card { top: auto; bottom: 76px; left: var(--edge); right: var(--edge); max-width: none; padding: 14px 16px; }
-    .mark-card p { display: none; }
   }
 </style>
 </head>
@@ -133,7 +124,7 @@
 <nav class="nav">
   <div class="mark">SC<b>•</b>29</div>
   <div class="links mono">
-    <a href="#teleWrap" class="on">The Film</a><a href="#read">The Marks</a><a href="#read">The Read</a>
+    <a href="#marks" class="on">The Marks</a><a href="#read">The Read</a><a href="#read">The Fix</a>
   </div>
   <div class="cta">
     <a class="pill mono" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check</a>
@@ -141,64 +132,106 @@
   </div>
 </nav>
 
-<div class="tele-wrap" id="teleWrap">
-  <div class="tele" id="tele">
-    <div class="num">01</div>
-    <canvas id="film"></canvas>
-    <div class="shade"></div>
-    <svg class="marks" id="marks" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <g id="g1" opacity="0">
-        <path class="d" d="M62,18 L74,44 L58,66" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
-        <circle class="d" cx="74" cy="44" r="4.5" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
-      </g>
-      <g id="g2" opacity="0">
-        <path class="d" d="M30,72 L46,60 L62,64" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
-        <circle class="d" cx="46" cy="60" r="3.6" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
-      </g>
-      <g id="g3" opacity="0">
-        <path class="d" d="M22,30 L40,26 L58,30" fill="none" stroke="#FFD200" stroke-width="1.1" pathLength="1"/>
-        <path class="d" d="M22,34 L58,34" fill="none" stroke="#FFD200" stroke-width="1.1" pathLength="1" stroke-dasharray="2 1.6"/>
-      </g>
-      <g id="g4" opacity="0">
-        <circle class="d" cx="70" cy="70" r="9" fill="none" stroke="#E10600" stroke-width="1.3" pathLength="1"/>
-        <path class="d" d="M70,61 L70,50 M70,79 L70,88 M61,70 L52,70 M79,70 L88,70" fill="none" stroke="#E10600" stroke-width="1.1" pathLength="1"/>
-      </g>
-    </svg>
+<section class="hero">
+  <img class="bg" src="/stills/swing-hero.jpg" alt="Golfer at the driving range at night">
+  <div class="shade"></div>
+  <div class="num">01</div>
+  <svg class="marks" viewBox="0 0 100 56.25" preserveAspectRatio="xMidYMid slice">
+    <g fill="none" stroke="#E10600" stroke-width="0.4">
+      <circle cx="52" cy="21" r="4.2"/>
+      <path d="M55.5,17.5 L68,10"/>
+      <circle cx="68" cy="10" r="1.3" fill="#E10600" stroke="none"/>
+    </g>
+    <g fill="none" stroke="#FFD200" stroke-width="0.4">
+      <path d="M40,15.5 L66,15.5" stroke-dasharray="2.2 1.6"/>
+    </g>
+  </svg>
+  <div class="inner">
     <div class="intro">
-      <div class="loc mono"><span class="dot"></span>Slow-mo bay — 24 fps scrub</div>
+      <div class="loc mono"><span class="dot"></span>Slow-mo bay — frame analysis</div>
       <h1>The<br>Telestrator</h1>
-      <p>One continuous slow-motion film, start to impact. Scroll is the jog wheel: drag the swing forward and back while the telestrator draws what a coach would circle.</p>
+      <p>You have watched your swing on video before. It did not help, because full speed hides the two frames that matter. The Swing Check circles the actual fault and tells you which one to fix first.</p>
     </div>
-    <div class="hud tr mono">Frame <b id="frame">000</b> / 113<br>24 fps — jog enabled</div>
     <div class="rail">
-      <svg class="path" viewBox="0 0 210 120" fill="none">
-        <path id="swingPath" d="M20,105 C60,100 70,70 95,68 C120,66 130,40 175,32" stroke="#E10600" stroke-width="2.5" pathLength="1"/>
-        <circle cx="20" cy="105" r="4" fill="#E10600"/><circle cx="175" cy="32" r="4" fill="#FFD200"/>
+      <svg class="path" viewBox="0 0 230 120" fill="none">
+        <path d="M18,108 C62,102 72,72 98,70 C124,68 134,42 198,34" stroke="#E10600" stroke-width="2.5"/>
+        <circle cx="18" cy="108" r="4.5" fill="#E10600"/><circle cx="198" cy="34" r="4.5" fill="#FFD200"/>
       </svg>
-      <div class="lab mono">Swing path — traced live</div>
+      <div class="lab mono">Swing path — traced</div>
       <div class="stats mono">
-        <div><b id="stFrame">000</b><span>Frame</span></div>
         <div><b>04</b><span>Marks</span></div>
         <div class="hl"><b>24</b><span>FPS</span></div>
       </div>
     </div>
-    <div class="mark-card" id="markCard">
-      <span class="n mono" id="mkN">Mark 01 / 04</span>
-      <h3 id="mkH">The position at the top</h3>
-      <p id="mkP">This is where most swings are won or lost, and it happens too fast to see at full speed. Scrub it back and forth — the club's position here decides everything after.</p>
+  </div>
+  <div class="strip mono">
+    <span>Frame-by-frame coach analysis</span><span>04 marks / 01 film <span style="color:var(--red)">→</span></span>
+  </div>
+</section>
+
+<section class="marks-sec" id="marks">
+  <span class="n mono">The marks — drawn on your actual frames</span>
+  <h2>Stop guessing.<br><span>Start seeing.</span></h2>
+  <p>Send two clips — down the line and face on. Phone video is enough. Every mark below is drawn on a real frame, in fix order, because fixing the wrong thing is how a slice becomes a shank.</p>
+  <div class="mark-grid">
+    <div class="mcard">
+      <div class="frame">
+        <img src="/stills/swing-thumb1.jpg" alt="Swing frame with telestrator mark one">
+        <svg viewBox="0 0 100 56.25" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#E10600" stroke-width="0.8"><circle cx="50" cy="26" r="9"/><path d="M50,17 L50,8 M50,35 L50,44 M41,26 L32,26 M59,26 L68,26"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <span class="n mono">Mark 01 / 04</span>
+        <h3>The position at the top</h3>
+        <p>This is where most swings are won or lost, and it happens too fast to see at full speed. The club's position here decides everything after.</p>
+      </div>
     </div>
-    <div class="cue mono">Scroll</div>
-    <div class="strip mono">
-      <span>Slow-mo analysis — frame by frame</span><span>04 marks / 01 film <span style="color:var(--red)">→</span></span>
+    <div class="mcard">
+      <div class="frame">
+        <img src="/stills/swing-thumb2.jpg" alt="Swing frame with telestrator mark two">
+        <svg viewBox="0 0 100 56.25" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#E10600" stroke-width="0.8"><path d="M30,40 L48,30 L66,34"/><circle cx="48" cy="30" r="6"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <span class="n mono">Mark 02 / 04</span>
+        <h3>The first move down</h3>
+        <p>The downswing's first six inches write the rest of the story. If the club drops under the plane here, the body spends the whole downswing compensating.</p>
+      </div>
+    </div>
+    <div class="mcard">
+      <div class="frame">
+        <img src="/stills/swing-hero.jpg" alt="Swing frame with telestrator mark three">
+        <svg viewBox="0 0 100 56.25" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#FFD200" stroke-width="0.8"><path d="M28,20 L50,17 L72,20"/><path d="M28,24 L72,24" stroke-dasharray="2.4 1.8"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <span class="n mono">Mark 03 / 04</span>
+        <h3>The strike zone</h3>
+        <p>Yellow lines, because this is the money zone. Path and face at impact, frozen — the only two numbers that decide where the ball actually goes.</p>
+      </div>
+    </div>
+    <div class="mcard">
+      <div class="frame">
+        <img src="/stills/swing-thumb1.jpg" alt="Swing frame with telestrator mark four">
+        <svg viewBox="0 0 100 56.25" preserveAspectRatio="xMidYMid slice">
+          <g fill="none" stroke="#E10600" stroke-width="0.8"><circle cx="62" cy="30" r="10"/><path d="M62,20 L62,10 M62,40 L62,50"/></g>
+        </svg>
+      </div>
+      <div class="body">
+        <span class="n mono">Mark 04 / 04</span>
+        <h3>The finish tells</h3>
+        <p>A balanced finish is a receipt for everything before it. If the swing ends in balance, the sequence worked.</p>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <section class="read" id="read">
-  <span class="n mono">The read — after the film</span>
-  <h2>Stop guessing.<br><span>Start seeing.</span></h2>
-  <p>You have watched your swing on video before. It did not help, because full speed hides the two frames that matter. The Swing Check isolates those frames, circles the actual fault, and tells you which one to fix first — because fixing the wrong thing is how a slice becomes a shank.</p>
-  <p>Send two clips. Get the telestrator treatment: every mark drawn on your swing, every fix in order, none of the guesswork.</p>
+  <h2>The read.</h2>
+  <p>Two clips in. The telestrator treatment back: every mark drawn on your swing, every fix in order, none of the guesswork.</p>
   <div class="row">
     <div class="cell"><b>02</b><p class="mono">Clips — down the line + face on. Phone video is enough.</p></div>
     <div class="cell"><b>04</b><p class="mono">Marks drawn on your actual frames, in fix order.</p></div>
@@ -208,71 +241,10 @@
 
 <section class="finale">
   <h2>Send the clips.<br><span>Get the truth.</span></h2>
-  <div><a class="btn" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check ↗</a></div>
+  <a class="btn" href="https://swing-check-loongpancoasts-projects.vercel.app/">Start my swing check ↗</a>
 </section>
 
-<footer class="foot mono"><span>The Telestrator — a DriveOn breakdown</span><span>Film 01 / 04 marks</span></footer>
+<footer class="foot mono"><span>The Telestrator — a DriveOn breakdown</span><span>04 marks / 01 film</span></footer>
 
-<script type="module">
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Film } from '/src/film.js';
-gsap.registerPlugin(ScrollTrigger);
-
-const COUNT = 113;
-const film = new Film(document.getElementById('film'), 'swing', COUNT);
-const frameEl = document.getElementById('frame');
-const stFrame = document.getElementById('stFrame');
-
-const groups = ['g1','g2','g3','g4'].map(id => document.getElementById(id));
-groups.forEach(g => g.querySelectorAll('.d').forEach(el => {
-  el.style.strokeDasharray = 1; el.style.strokeDashoffset = 1;
-}));
-const marks = [
-  { n: 'Mark 01 / 04', h: 'The position at the top', p: "This is where most swings are won or lost, and it happens too fast to see at full speed. Scrub it back and forth — the club's position here decides everything after." },
-  { n: 'Mark 02 / 04', h: 'The first move down', p: "The downswing's first six inches write the rest of the story. If the club drops under the plane here, the body spends the whole downswing compensating." },
-  { n: 'Mark 03 / 04', h: 'The strike zone', p: "Yellow lines, because this is the money zone. Path and face at impact, frozen — the only two numbers that decide where the ball actually goes." },
-  { n: 'Mark 04 / 04', h: 'The finish tells', p: "A balanced finish is a receipt for everything before it. If the swing ends here, the sequence worked. If not, scroll back — the answer is in marks one through three." },
-];
-const card = document.getElementById('markCard');
-let curMark = -1;
-function showMark(i) {
-  if (i === curMark) return; curMark = i;
-  const m = marks[i];
-  gsap.to(card, { opacity: 0, y: 10, duration: .22, ease: 'power2.in', onComplete() {
-    document.getElementById('mkN').textContent = m.n;
-    document.getElementById('mkH').textContent = m.h;
-    document.getElementById('mkP').textContent = m.p;
-    gsap.to(card, { opacity: 1, y: 0, duration: .35, ease: 'power2.out' });
-  }});
-}
-const tl = gsap.timeline({ paused: true });
-groups.forEach((g, i) => {
-  const t = 0.06 + i * 0.24;
-  tl.to(g, { opacity: 1, duration: 0.02 }, t);
-  tl.to(g.querySelectorAll('.d'), { strokeDashoffset: 0, duration: 0.09, ease: 'power1.inOut', stagger: 0.02 }, t);
-  if (i < groups.length - 1) tl.to(g, { opacity: 0, duration: 0.05 }, t + 0.17);
-});
-tl.to('#swingPath', { strokeDashoffset: 0, duration: 1, ease: 'none' }, 0);
-document.getElementById('swingPath').style.strokeDasharray = 1;
-document.getElementById('swingPath').style.strokeDashoffset = 1;
-
-ScrollTrigger.create({
-  trigger: '#teleWrap', start: 'top top', end: 'bottom bottom', scrub: true,
-  onUpdate(self) {
-    const p = self.progress;
-    film.draw(p);
-    tl.progress(p);
-    const f = Math.min(COUNT - 1, Math.floor(p * COUNT));
-    const s = String(f).padStart(3, '0');
-    frameEl.textContent = s; stFrame.textContent = s;
-    showMark(Math.min(3, Math.floor(p * 4)));
-  }
-});
-gsap.utils.toArray('.read > *').forEach(el => {
-  gsap.from(el, { y: 40, opacity: 0, duration: .9, ease: 'power3.out',
-    scrollTrigger: { trigger: el, start: 'top 82%' } });
-});
-</script>
 </body>
 </html>
