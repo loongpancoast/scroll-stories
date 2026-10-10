@@ -143,3 +143,8 @@ footer.site a { color: var(--muted); }
   .grain { animation: none; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Film canvas: never pure black while the first frame loads */
+canvas[id="film"], canvas[data-film], canvas#heroFilm {
+  background: radial-gradient(80% 80% at 50% 45%, #141414 0%, #050505 70%, #000 100%);
+}
